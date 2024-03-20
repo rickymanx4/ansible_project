@@ -330,3 +330,61 @@
         - dest: "{{ destinationCidrBlock }}" 
           gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
     register: was_rt_result
+
+# create a ec2 for bastion
+  - name: start an instance with a public IP address
+    amazon.aws.ec2_instance:
+      name: "{{ ec2_name_bastion }}"
+      key_name: "{{ keys }}"
+      instance_type: "{{ instancesize_bastion }}"
+      security_group: "{{ security_group_bastion_result.group_id }}"    
+      vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+      instance_role: "{{ instance_role }}"
+      network:
+        assign_public_ip: true    
+      image_id: "{{ images }}"
+      tags:
+        Name: "{{ ec2_name_bastion }}"
+      user_data: "{{ bastion_data }}"
+    register: ec2_bastion_result
+
+# create an autoscaling group for web,was
+  - name: Configure Web Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_web }}"      
+      vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]    
+      launch_template: 
+        version: '1'
+        launch_template_name: "{{ template_name }}"
+        launch_template_id: "{{ template_id }}"
+#     health_check_type: ELB
+#     health_check_period: 60
+      desired_capacity: 2
+      replace_all_instances: yes
+      min_size: 2
+      max_size: 6
+#      load_balancers:
+#        - exalb
+      state: present
+      tags:
+        Name: "{{ as_ec2_name_web }}"      
+    register: web_asg_result
+
+
+#  - name: Configure Scaling Policies
+#    community.aws.autoscaling_policy:
+#      region: "{{ region }}"
+#      name: "{{ as_poliy_name_web }}"
+#      asg_name: "{{ web_asg_result.auto_scaling_group_name }}"
+#      state: "{{ state }}"
+#      adjustment_type: "ChangeInCapacity"
+#      min_adjustment_step: 1
+#      scaling_adjustment: 1 
+#      cooldown: 100
+#    register: as_policy_result
+
+
+
+
+
