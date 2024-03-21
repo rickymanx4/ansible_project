@@ -1,9 +1,24 @@
 ---
-- hosts: localhost
+- name: start a ansible_project
+  hosts: localhost
   gather_facts: yes
   connection: localhost
+  remote_user: nana
   roles:
-  - ansile-project
+    - roel: ansible_project
+      become: true
+      become_user: root
+
+  vars_files:
+    - ./ansible_project/vars/vars.yaml
+
+  tasks_files:
+    - ./ansible_project/tasks/vpc.yaml 
+    - ./ansible_project/tasks/ec2.yaml
+    - ./ansible_project/tasks/auto_scaling_group.yaml
+    - ./ansible_project/tasks/load_balancer.yaml
+    - ./ansible_project/tasks/cloudwatch.yaml
+  
 
 
-# ansible-navigator run –m stdout main.yaml  
+# ansible-navigator run -m stdout main.yaml  
