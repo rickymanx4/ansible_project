@@ -1,4 +1,8 @@
-# create a ec2 for bastion
+#######################################
+############  vim ec2.yml  ############
+#######################################
+
+############ create a ec2 for bastion ###########
   - name: start an instance with a public IP address
     amazon.aws.ec2_instance:
       name: "{{ ec2_name_bastion }}"
