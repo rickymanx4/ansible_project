@@ -1,3 +1,6 @@
+#######################################
+############  vim vpc.yml  ############
+#######################################
 ---
 - hosts: localhost
   gather_facts: no
@@ -6,7 +9,7 @@
     - ./vars.yaml
 
   tasks:
-# create a vpc with name, cidr block,dns support, and tenancy
+########### create a vpc with name, cidr block,dns support, and tenancy ###########
   - name: create a new ec2 VPC    
     amazon.aws.ec2_vpc_net:
       aws_access_key: "{{ aws_access_key }}"
@@ -22,7 +25,7 @@
       state: "{{ state }}"
     register: ec2_vpc_net_result
 
-# create an internet gateway for the vpc    
+############ create an internet gateway for the vpc ###########   
   - name: create ec2 vpc internet gateway           
     amazon.aws.ec2_vpc_igw:
       aws_access_key: "{{ aws_access_key }}"
@@ -34,7 +37,7 @@
         Name: "{{ igw_name }}"
     register: igw_result
 
-# create the subnet for the vpc with a cidr block    
+############ create the subnet for the vpc with a cidr block ###########   
   - name: create ec2 vpc subnet_pub1
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -48,6 +51,7 @@
       resource_tags:
         Name: "{{ subnet_name_pub1 }}"
     register: subnet_pub1_result
+
   - name: create ec2 vpc subnet_pub2
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -61,6 +65,7 @@
       resource_tags:
         Name: "{{ subnet_name_pub2 }}"
     register: subnet_pub2_result        
+
   - name: create ec2 vpc subnet_web1
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -74,6 +79,7 @@
       resource_tags:
         Name: "{{ subnet_name_web1 }}"
     register: subnet_web1_result
+
   - name: create ec2 vpc subnet_web2
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -87,6 +93,7 @@
       resource_tags:
         Name: "{{ subnet_name_web2 }}"
     register: subnet_web2_result    
+
   - name: create ec2 vpc subnet_was1
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -100,6 +107,7 @@
       resource_tags:
         Name: "{{ subnet_name_was1 }}"
     register: subnet_was1_result    
+
   - name: create ec2 vpc subnet_was2
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -113,6 +121,7 @@
       resource_tags:
         Name: "{{ subnet_name_was2 }}"
     register: subnet_was2_result    
+
   - name: create ec2 vpc subnet_db1
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -126,6 +135,7 @@
       resource_tags:
         Name: "{{ subnet_name_db1 }}"
     register: subnet_db1_result    
+
   - name: create ec2 vpc subnet_db2
     amazon.aws.ec2_vpc_subnet:
       aws_access_key: "{{ aws_access_key }}"
@@ -140,7 +150,7 @@
         Name: "{{ subnet_name_db2 }}"
     register: subnet_db2_result    
 
-# create a security group for the vpc
+############ create a security group for the vpc ###########
   - name: create ec2-bastion security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -164,6 +174,7 @@
         cidr_ip: "{{ destinationCidrBlock }}"
         rule_desc: allow all on port 80        
     register: security_group_bastion_result
+
   - name: create ec2-external-load-balancer security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -182,6 +193,7 @@
         cidr_ip: "{{ destinationCidrBlock }}"
         rule_desc: allow all on port 80        
     register: security_group_exlb_result
+
   - name: create ec2-web security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -198,7 +210,7 @@
         ports:
         - 22
         cidr_ip: "{{ subNetCidrBlock_pub1 }}"
-#        group_name: "{{ security_group_name_bastion }}"
+      # group_name: "{{ security_group_name_bastion }}"
         rule_desc: allow all on port 22
       - proto: tcp
         ports:
@@ -206,6 +218,7 @@
         group_name: "{{ security_group_name_exlb }}"
         rule_desc: allow all on port 80        
     register: security_group_web_result    
+
   - name: create ec2-internal-load-balancer security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -224,6 +237,7 @@
         group_name: "{{ security_group_name_web }}"
         rule_desc: allow all on port 80        
     register: security_group_inlb_result            
+
   - name: create ec2-was security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -247,6 +261,7 @@
         group_name: "{{ security_group_name_inlb }}"
         rule_desc: allow all on port 80        
     register: security_group_was_result
+
   - name: create ec2-db security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -266,7 +281,7 @@
         rule_desc: allow all on port 3306      
     register: security_group_db_result
 
-# create a elastic IP for nat gateway
+############ create a elastic IP for nat gateway ###########
 #  - name: allocate a new elastic IP 
 #    amazon.aws.ec2_eip:
 #      state: "{{ state }}"
@@ -274,7 +289,7 @@
 #        name:  "{{ eip_name }}"
 #    register: eip_result
 
-# create a nat gateway for private routing table
+############ create a nat gateway for private routing table ###########
 #  - name: Create new nat gateway 
 #    amazon.aws.ec2_vpc_nat_gateway:
 #      aws_access_key: "{{ aws_access_key }}"
@@ -303,6 +318,7 @@
         - dest: "{{ destinationCidrBlock }}" 
           gateway_id: "{{ igw_result.gateway_id }}"
     register: public_rt_result
+
   - name: create ec2 VPC web subnet route table    
     amazon.aws.ec2_vpc_route_table:
       aws_access_key: "{{ aws_access_key }}"
@@ -316,6 +332,7 @@
       routes:
         - dest: "{{ destinationCidrBlock }}" 
           gateway_id: "{{ test_nat_gateway_id }}"
+
     register: web_rt_result
   - name: create ec2 VPC was subnet route table    
     amazon.aws.ec2_vpc_route_table:
