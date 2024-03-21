@@ -1,0 +1,69 @@
+#######################################################
+############  vim auto_scaling_groups.yml  ############
+#######################################################
+
+############ create web/was launch template ###########
+  - name: create a we launch template configuration with an encrypted volume
+    community.aws.autoscaling_launch_config:
+      name: "{{ launch_template_name_web }}"
+      image_id: "{{ images }}"
+      key_name: "{{ keys }}"
+      security_groups: [ "{{ security_group_web_result.group_id }}" ]            
+      instance_type: "{{ instancesize_private }}"
+      #instance_profile_name: "{{ instance_role }}"      
+      volumes:
+        - device_name: /dev/sda1
+          volume_size: 15
+          volume_type: standard
+    register: launch_template_web_result 
+
+  - name: create a was launch template configuration with an encrypted volume
+    community.aws.autoscaling_launch_config:
+      name: "{{ launch_template_name_was }}"
+      image_id: "{{ images }}"
+      key_name: "{{ keys }}"
+      security_groups: [ "{{ security_group_was_result.group_id }}" ]            
+      instance_type: "{{ instancesize_private }}"
+      #instance_profile_name: "{{ instance_role }}"      
+      volumes:
+        - device_name: /dev/sda1
+          volume_size: 15
+          volume_type: standard
+    register: launch_template_was_result
+
+############ create web/was auto scaling group ###########
+  - name: Configure Web Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"    
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_web }}"      
+      launch_config_name: "{{ launch_template_name_web }}"
+      vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]    
+      #launch_template: 
+      #  version: '1'        
+      #  launch_template_name: "{{ template_name_web }}"
+      #  launch_template_id: "{{ template_id_web }}"       
+      desired_capacity: 2      
+      min_size: 2
+      max_size: 6
+      state: present     
+    register: web_asg_result
+
+  - name: Configure Was Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"    
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_was }}"      
+      launch_config_name: "{{ launch_template_name_was }}"
+      vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
+      #launch_template: 
+      #  version: '1'
+      #  launch_template_name: "{{ template_name_was }}"
+      #  launch_template_id: "{{ template_id_was }}"
+      desired_capacity: 2
+      min_size: 2
+      max_size: 6
+      state: present     
+    register: was_asg_result
