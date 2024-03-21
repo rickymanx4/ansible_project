@@ -1,0 +1,89 @@
+#################################################
+############  vim load_balancer.yml  ############
+#################################################
+
+############ create a target group for external lb ###########
+  - name: Create Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_web }}"
+      protocol: HTTP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_web_result      
+
+############ target attach to external target group ###########
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[1] }}"
+      state: "{{ state }}"      
+
+############ create an Elastic Load Balancer for web_asg ###########
+  - name: Configure Elastic Load Balancers
+    amazon.aws.elb_application_lb:
+      region: "{{ region }}"
+      name: "{{ lb_name_external }}"
+      state: "{{ state }}"
+      subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}" ]
+      security_groups: [ "{{ security_group_exlb_result.group_id }}" ]
+      scheme: "internet-facing"
+      listeners:
+        - Protocol: HTTP
+          Port: 80
+          DefaultActions: 
+            - Type: "forward"
+              TargetGroupName: "{{ tg_web_result.target_group_name }}"       
+    register: exlb_result       
+
+############ create a target group for internal lb ###########
+  - name: Create Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_was }}"
+      protocol: HTTP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_was_result      
+
+############ target attach to internal target group ###########
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[1] }}"
+      state: "{{ state }}"      
+
+
+############ create an Elastic Load Balancer for was_asg ###########
+  - name: Create an ELB and attach a listener
+    community.aws.elb_network_lb:
+      name: "{{ lb_name_internal }}"
+      subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}" ]
+      security_groups: [ "{{ security_group_inlb_result.group_id }}" ]
+      state: "{{ state }}"
+      scheme: "internal"
+      listeners:
+        - Protocol: TCP 
+          Port: 80 
+          DefaultActions:
+            - Type: forward 
+              TargetGroupName: "{{ tg_was_result.target_group_name }}"
+    register: inlb_result
