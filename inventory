@@ -1,0 +1,2 @@
+[instance]
+servera.amazon.com ansible_host=52.37.240.221

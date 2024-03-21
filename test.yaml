@@ -6,7 +6,7 @@
     - ./vars.yaml
 
   tasks:
-  # create a vpc with name, cidr block,dns support, and tenancy
+# create a vpc with name, cidr block,dns support, and tenancy
   - name: create a new ec2 VPC    
     amazon.aws.ec2_vpc_net:
       aws_access_key: "{{ aws_access_key }}"
@@ -197,7 +197,8 @@
       - proto: tcp
         ports:
         - 22
-        group_name: "{{ security_group_name_bastion }}"
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+#        group_name: "{{ security_group_name_bastion }}"
         rule_desc: allow all on port 22
       - proto: tcp
         ports:
@@ -222,7 +223,7 @@
         - 80
         group_name: "{{ security_group_name_web }}"
         rule_desc: allow all on port 80        
-    register: security_group_exlb_result            
+    register: security_group_inlb_result            
   - name: create ec2-was security group
     amazon.aws.ec2_group:
       aws_access_key: "{{ aws_access_key }}"
@@ -238,7 +239,7 @@
       - proto: tcp
         ports:
         - 22
-        group_name: "{{ security_group_name_bastion }}"
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
         rule_desc: allow all on port 22
       - proto: tcp
         ports:
@@ -266,25 +267,25 @@
     register: security_group_db_result
 
 # create a elastic IP for nat gateway
-  - name: allocate a new elastic IP 
-    amazon.aws.ec2_eip:
-      state: "{{ state }}"
-      tags:
-        name:  "{{ eip_name }}"
-    register: eip_result
+#  - name: allocate a new elastic IP 
+#    amazon.aws.ec2_eip:
+#      state: "{{ state }}"
+#      tags:
+#        name:  "{{ eip_name }}"
+#    register: eip_result
 
 # create a nat gateway for private routing table
-  - name: Create new nat gateway 
-    amazon.aws.ec2_vpc_nat_gateway:
-      aws_access_key: "{{ aws_access_key }}"
-      aws_secret_key: "{{ aws_secret_key }}"
-      state: "{{ state }}"
-      subnet_id: "{{ subnet_pub2_result.subnet.id }}"
-      eip_address: "{{ eip_result.public_ip }}"
-      region: "{{ region }}"
-      tags:
-        name:  "{{ nat_gateway_name }}"      
-    register: nat_gateway_result
+#  - name: Create new nat gateway 
+#    amazon.aws.ec2_vpc_nat_gateway:
+#      aws_access_key: "{{ aws_access_key }}"
+#      aws_secret_key: "{{ aws_secret_key }}"
+#      state: "{{ state }}"
+#      subnet_id: "{{ subnet_pub2_result.subnet.id }}"
+#      eip_address: "{{ eip_result.public_ip }}"
+#      region: "{{ region }}"
+#      tags:
+#        name:  "{{ nat_gateway_name }}"      
+#    register: nat_gateway_result
 
 # create route table and connect subnet to routes
   - name: create ec2 VPC public subnet route table    
@@ -314,7 +315,7 @@
       subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]      
       routes:
         - dest: "{{ destinationCidrBlock }}" 
-          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+          gateway_id: "{{ test_nat_gateway_id }}"
     register: web_rt_result
   - name: create ec2 VPC was subnet route table    
     amazon.aws.ec2_vpc_route_table:
@@ -328,9 +329,8 @@
       subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]      
       routes:
         - dest: "{{ destinationCidrBlock }}" 
-          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+          gateway_id: "{{ test_nat_gateway_id }}"
     register: was_rt_result
-
 # create a ec2 for bastion
   - name: start an instance with a public IP address
     amazon.aws.ec2_instance:
@@ -347,44 +347,180 @@
         Name: "{{ ec2_name_bastion }}"
       user_data: "{{ bastion_data }}"
     register: ec2_bastion_result
-
-# create an autoscaling group for web,was
   - name: Configure Web Auto Scaling Group and perform rolling deploy
     amazon.aws.autoscaling_group:
       region: "{{ region }}"
       name: "{{ autoscaling_name_web }}"      
       vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]    
       launch_template: 
-        version: '1'
-        launch_template_name: "{{ template_name }}"
-        launch_template_id: "{{ template_id }}"
-#     health_check_type: ELB
-#     health_check_period: 60
+        version: '2'
+        launch_template_name: "{{ template_name_web }}"
+        launch_template_id: "{{ template_id_web }}"
       desired_capacity: 2
       replace_all_instances: yes
       min_size: 2
       max_size: 6
-#      load_balancers:
-#        - exalb
-      state: present
-      tags:
-        Name: "{{ as_ec2_name_web }}"      
+      state: present     
     register: web_asg_result
 
+  - name: Configure Was Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_was }}"      
+      vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
+      launch_template: 
+        version: '1'
+        launch_template_name: "{{ template_name_was }}"
+        launch_template_id: "{{ template_id_was }}"
+      desired_capacity: 2
+      replace_all_instances: yes
+      min_size: 2
+      max_size: 6
+      state: present     
+    register: was_asg_result     
+# create a target group for external lb
+  - name: Create Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_web }}"
+      protocol: HTTP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_web_result      
 
-#  - name: Configure Scaling Policies
-#    community.aws.autoscaling_policy:
-#      region: "{{ region }}"
-#      name: "{{ as_poliy_name_web }}"
-#      asg_name: "{{ web_asg_result.auto_scaling_group_name }}"
-#      state: "{{ state }}"
-#      adjustment_type: "ChangeInCapacity"
-#      min_adjustment_step: 1
-#      scaling_adjustment: 1 
-#      cooldown: 100
-#    register: as_policy_result
+# target attach to external target group
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[1] }}"
+      state: "{{ state }}"      
 
+# create an Elastic Load Balancer for web_asg
+  - name: Configure Elastic Load Balancers
+    amazon.aws.elb_application_lb:
+      region: "{{ region }}"
+      name: "{{ lb_name_external }}"
+      state: "{{ state }}"
+      subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}" ]
+      security_groups: [ "{{ security_group_exlb_result.group_id }}" ]
+      scheme: "internet-facing"
+      listeners:
+        - Protocol: HTTP
+          Port: 80
+          DefaultActions: 
+            - Type: "forward"
+              TargetGroupName: "{{ tg_web_result.target_group_name }}"       
+    register: exlb_result       
 
+# create a target group for internal lb
+  - name: Create Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_was }}"
+      protocol: HTTP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_was_result      
 
+# target attach to internal target group
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[1] }}"
+      state: "{{ state }}"      
 
+# create an Elastic Load Balancer for was_asg
+  - name: Configure Elastic Load Balancers
+    amazon.aws.elb_application_lb:
+      region: "{{ region }}"
+      name: "{{ lb_name_internal }}"
+      state: "{{ state }}"
+      subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}" ]
+      security_groups: [ "{{ security_group_inlb_result.group_id }}" ]
+      scheme: "internal"
+      listeners:
+        - Protocol: HTTP
+          Port: 80
+          DefaultActions: 
+            - Type: "forward"
+              TargetGroupName: "{{ tg_was_result.target_group_name }}"       
+    register: inlb_result 
+# create auto-scaling policy
+  - name: Configure Scaling Policies
+    community.aws.autoscaling_policy:
+      region: "{{ region }}"
+      name: "{{ as_poliy_name_web }}"
+      asg_name: "{{ web_asg_result.auto_scaling_group_name }}"
+      state: "{{ state }}"
+      adjustment_type: "{{ item.adjustment_type }}"
+      min_adjustment_step: "{{ item.min_adjustment_step }}"
+      scaling_adjustment: "{{ item.scaling_adjustment }}"
+      cooldown: "{{ item.cooldown }}"
+    with_items:
+      - name: "Increase Group Size"
+        adjustment_type: "ChangeInCapacity"
+        scaling_adjustment: +1
+        min_adjustment_step: 1
+        cooldown: 60
+      - name: "Decrease Group Size"
+        adjustment_type: "ChangeInCapacity"
+        scaling_adjustment: -1
+        min_adjustment_step: 1
+        cooldown: 60      
+    register: as_policy_result 
 
+# metric alarm1 cpu =< 50
+  - name: Configure Metric Alarms and link to Scaling Policies
+    amazon.aws.cloudwatch_metric_alarm:
+      region: "{{ region }}"
+      name: "{{ metric_alarm_web1 }}"
+      state: "{{ state }}"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      comparison: "GreaterThanOrEqualToThreshold"
+      threshold: 50.0
+      period: 60
+      evaluation_periods: 5
+      unit: "Percent"
+      dimensions:
+        AutoScalingGroupName: "{{ web_asg_result.auto_scaling_group_name }}"
+      alarm_actions: "{{ as_policy_result.results[0].arn }}"   
+    register: web1_metric_alarm_result 
+
+# metric alarm2 cpu => 20
+  - name: Configure Metric Alarms and link to Scaling Policies
+    amazon.aws.cloudwatch_metric_alarm:
+      region: "{{ region }}"
+      name: "{{ metric_alarm_web2 }}"
+      state: "{{ state }}"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      comparison: "LessThanOrEqualToThreshold"
+      threshold: 20.0
+      period: 60
+      evaluation_periods: 5
+      unit: "Percent"
+      dimensions:
+        AutoScalingGroupName: "{{ web_asg_result.auto_scaling_group_name }}"
+      alarm_actions: "{{ as_policy_result.results[1].arn }}"   
+    register: web2_metric_alarm_result        
