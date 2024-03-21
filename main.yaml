@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: yes
+  connection: localhost
+  roles:
+  - ansile-project
+
+
+# ansible-navigator run –m stdout main.yaml  
