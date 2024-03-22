@@ -1,0 +1,10 @@
+---
+- hosts: tags_Name_project_ec2_bastion
+  gather_facts: no
+  vars_files:
+    - ./vars.yaml
+  tasks:
+    - name: Check HTML content installed
+      ansible.builtin.copy:
+        src: ./bastion_userdata.sh
+        dest: "/home/ec-2user"

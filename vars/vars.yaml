@@ -1,5 +1,3 @@
-aws_access_key: '************'
-aws_secret_key: '****************'
 vpc_title: 'project'
 vpc_name: "{{ vpc_title }}_VPC"
 igw_name: "{{ vpc_title }}_IGW"
@@ -33,26 +31,26 @@ subNetCidrBlock_db1: '100.100.210.0/24'
 subNetCidrBlock_db2: '100.100.220.0/24'
 destinationCidrBlock: '0.0.0.0/0'
 state: 'present'
-zone1: 'us-west-2a'
-zone2: 'us-west-2c'
-region: 'us-west-2'
+zone1: 'ap-northeast-1a'
+zone2: 'ap-northeast-1c'
+region: 'ap-northeast-1'
 keys: 'ec2-key'
 instancesize_bastion: 't2.micro'
 instancesize_private: 't2.small'
 instanscesize_rds: 't2.medium'
-images: 'ami-07bff6261f14c3a45'
-instance_role: 'arn:aws:iam::556683426101:instance-profile/cloudformation-full-role'
+images: 'ami-031134f7a79b6e424'
+instance_role: 'arn:aws:iam::569934397842:instance-profile/full-role-man'
 autoscaling_name_web: "{{ vpc_title }}_AS_web"
 autoscaling_name_was: "{{ vpc_title }}_AS_was"
 template_name_web: "project_template_web"
 template_name_was: "project_template_was"
-template_id_web: "lt-05733bb7edcfc3815"
-template_id_was: "lt-0ed9b0bb89fd73c61"
+template_id_web: "lt-081ac8e923b63fc50"
+template_id_was: "lt-090804155dc0a9544"
 eip_name: "{{ vpc_title }}_eip"
 nat_gateway_name: "{{ vpc_title }}_nat_gateway"
 ec2_name_bastion: "{{ vpc_title }}_ec2_bastion"
-bastion_data: "{{ lookup('file', 'bastion_data.sh') }}"
-test_nat_gateway_id: "nat-036d69b2477e5f12d"
+bastion_data: "{{ lookup('file', 'bastion_userdata.sh') }}"
+test_nat_gateway_id: "nat-073ac618d356fcead"
 as_poliy_name_web: "{{ vpc_title }}_AS_policy"
 metric_alarm_web1: "{{ vpc_title }}_metric_alarm1"
 metric_alarm_web2: "{{ vpc_title }}_metric_alarm2"
@@ -60,7 +58,10 @@ target_group_web: "{{ vpc_title }}-tg-web"
 target_group_was: "{{ vpc_title }}-tg-was"
 lb_name_external: "{{ vpc_title }}-lb-external"
 lb_name_internal: "{{ vpc_title }}-lb-internal"
-rds_name_01: "{{ vpc_title }}-rds-01"
-rds_name_02: "{{ vpc_title }}-rds-02"
+rds_name_01: "{{ vpc_title }}RDS01"
+rds_name_02: "{{ vpc_title }}RDS02"
+rds_ec2_name_01: "{{ vpc_title }}RDSec2"
 launch_template_name_web: "{{ vpc_title }}-lt-web"
 launch_template_name_was: "{{ vpc_title }}-lt-was"
+efs_name_web: "{{ vpc_title }}-efs-web"
+efs_name_was: "{{ vpc_title }}-efs-was"
