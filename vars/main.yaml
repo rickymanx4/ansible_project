@@ -1,5 +1,5 @@
-aws_access_key: 'AKIAYDHHK7E2TX3KKRWU'
-aws_secret_key: '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'
+aws_access_key: '************'
+aws_secret_key: '****************'
 vpc_title: 'project'
 vpc_name: "{{ vpc_title }}_VPC"
 igw_name: "{{ vpc_title }}_IGW"
