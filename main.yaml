@@ -4,13 +4,7 @@
   connection: localhost
   vars_files:
     - ./vars.yaml
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"      
+    
   tasks:
     - name: 1. creat vpc, igw, nat, eip
       ansible.builtin.import_tasks:
@@ -53,6 +47,19 @@
       ansible.builtin.import_tasks:
         file: tasks/10_bastion.yaml        
 
+- hosts: 
+  - web_asg
+  - was_asg
+  gather_facts: yes
+  vars: 
+    ansible_ssh_common_args:
+      -o ProxyCommand="ssh
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i ~/.ssh/ec2-key.pem
+      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
+
+  tasks:
     - name: 11. isntall python, pip for private ec2
       ansible.builtin.import_tasks:
         file: tasks/2_private.yaml        
@@ -61,5 +68,3 @@
     
   
 
-
-# ansible-navigator run -m stdout main.yaml  
