@@ -9,7 +9,7 @@ cache_max_age: 3600
 
 filters:
   tag:name:
-    - bastion
+    - project_ec2_bastion
     - web_asg
     - was_asg
   instance-state-name: running 
