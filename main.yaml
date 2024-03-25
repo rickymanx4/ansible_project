@@ -14,48 +14,48 @@
   tasks:
     - name: 1. creat vpc, igw, nat, eip
       ansible.builtin.import_tasks:
-        file: tats/1_vpc.yaml
+        file: tasks/1_vpc.yaml
 
     - name: 2. creat subnet
       ansible.builtin.import_tasks:
-        file: tats/2_subnet.yaml
+        file: tasks/2_subnet.yaml
 
     - name: 3. creat security_group
       ansible.builtin.import_tasks:
-        file: tats/3_security_group.yaml        
+        file: tasks/3_security_group.yaml        
 
     - name: 4. creat routing_tables
       ansible.builtin.import_tasks:
-        file: tats/4_routing_tables.yaml
+        file: tasks/4_routing_tables.yaml
 
     - name: 5. creat ec2 for bastion
       ansible.builtin.import_tasks:
-        file: tats/5_ec2.yaml
+        file: tasks/5_ec2.yaml
 
     - name: 6. creat auto scaling group
       ansible.builtin.import_tasks:
-        file: tats/6_auto_scaling_group.yaml        
+        file: tasks/6_auto_scaling_group.yaml        
 
     - name: 7. creat load_balancer
       ansible.builtin.import_tasks:
-        file: tats/7_load_balancer.yaml        
+        file: tasks/7_load_balancer.yaml        
 
     - name: 8. cloud watch for metric
       ansible.builtin.import_tasks:
-        file: tats/8_cloudwatch.yaml        
+        file: tasks/8_cloudwatch.yaml        
 
     - name: 9. creat efs
       ansible.builtin.import_tasks:
-        file: tats/9_efs.yaml        
+        file: tasks/9_efs.yaml        
 
     - name: 10. install ansible, awscli for bastion
       hosts: project_ec2_bastion
       ansible.builtin.import_tasks:
-        file: tats/10_bastion.yaml        
+        file: tasks/10_bastion.yaml        
 
     - name: 11. isntall python, pip for private ec2
       ansible.builtin.import_tasks:
-        file: tats/2_private.yaml        
+        file: tasks/2_private.yaml        
 
 
     
