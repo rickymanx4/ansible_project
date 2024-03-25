@@ -4,8 +4,8 @@
 
 
 - hosts: 
-  - tags_name_web_asg
-  - tags_name_was_asg
+  - web_asg
+  - was_asg
   vars: 
     ansible_ssh_common_args:
       -o ProxyCommand="ssh
@@ -65,7 +65,7 @@
 #########################################################################
 ################  private ec2(web) ansible ###########################
 #########################################################################
-- hosts: tags_name_web_asg
+- hosts: web_asg
   tasks: 
 ############ mount efs file system in web ec2 ###########                  
   - name: Mount up device by UUID
@@ -78,7 +78,7 @@
 #########################################################################
 ################  private ec2(was) ansible ###########################
 #########################################################################      
-- hosts: tags_name_was_asg
+- hosts: was_asg
   tasks: 
 ############ mount efs file system in was ec2 ###########                  
   - name: Mount up device by UUID
