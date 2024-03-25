@@ -1,0 +1,21 @@
+ - name: Install Prometheus
+   hosts: prometheus
+   become: true
+   gather_facts: true
+
+   tasks:
+     - name: Install Prometheus
+       dnf:
+         name: prometheus
+         state: present
+
+     - name: Copy Prometheus configuration file
+       template:
+         src: prometheus.yml
+         dest: /etc/prometheus/prometheus.yml
+
+     - name: Start Prometheus service
+       systemd:
+         name: prometheus
+         state: started
+         enabled: yes

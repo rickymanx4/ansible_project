@@ -1,0 +1,51 @@
+- name: Install Grafana Agent Flow
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Grafana Agent Flow
+      ansible.builtin.include_role:
+        name: grafana.grafana.grafana_agent
+      vars:
+        grafana_agent_mode: flow
+        # Change config file on the host to .river
+        grafana_agent_config_filename: config.river
+        # Change config file to be copied
+        grafana_agent_provisioned_config_file: '<path-to-config-file>'
+        # Remove default flags
+        grafana_agent_flags_extra:
+          server.http.listen-addr: '0.0.0.0:12345'
+
+- name: Install Grafana Agent in static mode
+  hosts: all
+  become: true
+
+  vars:
+    grafana_cloud_api_key: <Your Cloud Access Policy token> # Example - glc_eyJrIjoiYjI3NjI5MGQxZTcyOTIxYTc0MDgzMGVhNDhlODNhYzA5OTk2Y2U5YiIsIm4iOiJhbnNpYmxldGVzdCIsImlkIjo2NTI5
+    logs_username: <loki-username> # Example - 411478
+    loki_url: <loki-push-url> # Example - https://logs-prod-017.grafana.net/loki/api/v1/push
+  tasks:
+    - name: Install Grafana Agent in static mode
+      ansible.builtin.include_role:
+        name: grafana_agent
+      vars:
+        grafana_agent_logs_config:
+          configs:
+            - clients:
+                - basic_auth:
+                    password: '{{ grafana_cloud_api_key }}'
+                    username: '{{ logs_username }}'
+                  url: '{{ loki_url }}'
+              name: default
+              positions:
+                filename: /tmp/positions.yaml
+              scrape_configs:
+                - job_name: integrations/node_exporter_direct_scrape
+                  static_configs:
+                    - targets:
+                        - localhost
+                      labels:
+                        instance: hostname
+                        __path__: /var/log/*.log
+                        job: integrations/node_exporter
+              target_config:
+                sync_period: 10s          

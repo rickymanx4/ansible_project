@@ -1,0 +1,745 @@
+#######################################
+############  vim vpc.yml  ############
+#######################################
+---
+- hosts: localhost
+  gather_facts: no
+  connection: localhost
+  vars_files:
+    - ./vars.yaml
+
+  tasks:
+########### create a vpc with name, cidr block,dns support, and tenancy ###########
+  - name: create a new ec2 VPC    
+    amazon.aws.ec2_vpc_net:     
+      name: "{{ vpc_name }}" 
+      cidr_block: "{{ vpcCidrBlock }}"
+      region: "{{ region }}"
+      # enable dns support 
+      dns_support: yes
+      # enable dns hostnames
+      dns_hostnames: yes
+      tenancy: default
+      state: "{{ state }}"
+    register: ec2_vpc_net_result
+
+############ create an internet gateway for the vpc ###########   
+  - name: create ec2 vpc internet gateway           
+    amazon.aws.ec2_vpc_igw:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}" 
+      tags:
+        Name: "{{ igw_name }}"
+    register: igw_result
+
+############ create the subnet for the vpc with a cidr block ###########   
+  - name: create ec2 vpc subnet_pub1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub1 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub1 }}"
+    register: subnet_pub1_result
+
+  - name: create ec2 vpc subnet_pub2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub2 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub2 }}"
+    register: subnet_pub2_result        
+
+  - name: create ec2 vpc subnet_web1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web1 }}"
+    register: subnet_web1_result
+
+  - name: create ec2 vpc subnet_web2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web2 }}"
+    register: subnet_web2_result    
+
+  - name: create ec2 vpc subnet_was1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was1 }}"
+    register: subnet_was1_result    
+
+  - name: create ec2 vpc subnet_was2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was2 }}"
+    register: subnet_was2_result    
+
+  - name: create ec2 vpc subnet_db1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db1 }}"
+    register: subnet_db1_result    
+
+  - name: create ec2 vpc subnet_db2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db2 }}"
+    register: subnet_db2_result    
+
+############ create a security group for the vpc ###########
+  - name: create ec2-bastion security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_bastion }}"
+      description: "{{ security_group_name_bastion }}"
+      tags:
+        Name: "{{ security_group_name_bastion  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 80        
+    register: security_group_bastion_result
+
+  - name: create ec2-external-load-balancer security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_exlb }}"
+      description: "{{ security_group_name_exlb }}"
+      tags:
+        Name: "{{ security_group_name_exlb }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 80
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 80        
+    register: security_group_exlb_result
+
+  - name: create ec2-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_web }}"
+      description: "{{ security_group_name_web }}"
+      tags:
+        Name: "{{ security_group_name_web }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_exlb }}"
+        rule_desc: allow all on port 80        
+    register: security_group_web_result    
+
+  - name: create ec2-internal-load-balancer security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_inlb }}"
+      description: "{{ security_group_name_inlb }}"
+      tags:
+        Name: "{{ security_group_name_inlb }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_web }}"
+        rule_desc: allow all on port 80        
+    register: security_group_inlb_result            
+
+  - name: create ec2-was security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_was }}"
+      description: "{{ security_group_name_was }}"
+      tags:
+        Name: "{{ security_group_name_was  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_inlb }}"
+        rule_desc: allow all on port 80        
+    register: security_group_was_result
+
+  - name: create ec2-db security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_db }}"
+      description: "{{ security_group_name_db }}"
+      tags:
+        Name: "{{ security_group_name_db  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 3306
+        group_name: "{{ security_group_name_was }}"
+        rule_desc: allow all on port 3306      
+    register: security_group_db_result
+
+  - name: create ec2-efs-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_efs_web }}"
+      description: "{{ security_group_name_efs_web }}"
+      tags:
+        Name: "{{ security_group_name_efs_web  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 2049
+        group_name: "{{ security_group_name_web }}"
+        rule_desc: allow all on port 2049      
+    register: security_group_efs_web_result
+
+  - name: create ec2-efs-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_efs_was }}"
+      description: "{{ security_group_name_efs_was }}"
+      tags:
+        Name: "{{ security_group_name_efs_was  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 2049
+        group_name: "{{ security_group_name_was }}"
+        rule_desc: allow all on port 2049      
+    register: security_group_efs_was_result
+
+############ create a elastic IP for nat gateway ###########
+  - name: allocate a new elastic IP 
+    amazon.aws.ec2_eip:
+      state: "{{ state }}"
+      tags:
+        name:  "{{ eip_name }}"
+    register: eip_result
+
+############ create a nat gateway for private routing table ###########
+  - name: Create new nat gateway 
+    amazon.aws.ec2_vpc_nat_gateway:
+      state: "{{ state }}"
+      subnet_id: "{{ subnet_pub2_result.subnet.id }}"
+      eip_address: "{{ eip_result.public_ip }}"
+      region: "{{ region }}"
+      tags:
+        name:  "{{ nat_gateway_name }}"      
+    register: nat_gateway_result
+
+# create route table and connect subnet to routes
+  - name: create ec2 VPC public subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_public}}"
+      subnets: [ "{{ subnet_pub1_result.subnet.id }}", "{{ subnet_pub2_result.subnet.id }}"]
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          gateway_id: "{{ igw_result.gateway_id }}"
+    register: public_rt_result
+
+  - name: create ec2 VPC web subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_web }}"
+      subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]      
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          #gateway_id: "{{ test_nat_gateway_id }}"
+          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+    register: web_rt_result
+
+  - name: create ec2 VPC was subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_was }}"
+      subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]      
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          #gateway_id: "{{ test_nat_gateway_id }}"
+          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+    register: was_rt_result
+
+#######################################
+############  vim ec2.yml  ############
+#######################################
+
+############ create a ec2 for bastion ###########
+  - name: start an instance with a public IP address
+    amazon.aws.ec2_instance:
+      name: "{{ ec2_name_bastion }}"
+      key_name: "{{ keys }}"
+      instance_type: "{{ instancesize_bastion }}"
+      security_group: "{{ security_group_bastion_result.group_id }}"    
+      vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+      instance_role: "{{ instance_role }}"
+      network:
+        assign_public_ip: true    
+      image_id: "{{ images }}"
+      tags:
+        Name: "{{ ec2_name_bastion }}"
+      #user_data: "{{ bastion_data }}"
+    register: ec2_bastion_result
+
+#######################################################
+############  vim auto_scaling_groups.yml  ############
+#######################################################
+
+############ create web/was launch template ###########
+  # - name: create a we launch template configuration with an encrypted volume
+  #   community.aws.autoscaling_launch_config:
+  #     name: "{{ launch_template_name_web }}"
+  #     image_id: "{{ images }}"
+  #     key_name: "{{ keys }}"
+  #     security_groups: [ "{{ security_group_web_result.group_id }}" ]            
+  #     instance_type: "{{ instancesize_private }}"
+  #     #instance_profile_name: "{{ instance_role }}"      
+  #     volumes:
+  #       - device_name: /dev/sda1
+  #         volume_size: 15
+  #         volume_type: standard
+  #   register: launch_template_web_result 
+
+  # - name: create a was launch template configuration with an encrypted volume
+  #   community.aws.autoscaling_launch_config:
+  #     name: "{{ launch_template_name_was }}"
+  #     image_id: "{{ images }}"
+  #     key_name: "{{ keys }}"
+  #     security_groups: [ "{{ security_group_was_result.group_id }}" ]            
+  #     instance_type: "{{ instancesize_private }}"
+  #     #instance_profile_name: "{{ instance_role }}"      
+  #     volumes:
+  #       - device_name: /dev/sda1
+  #         volume_size: 15
+  #         volume_type: standard
+  #   register: launch_template_was_result
+
+############ create web/was auto scaling group ###########
+  - name: Configure Web Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:   
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_web }}"      
+#      launch_config_name: "{{ launch_template_name_web }}"
+      vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]
+      security_groups: [ "{{ security_group_web_result.group_id }}" ]           
+      launch_template: 
+        version: '1'        
+        launch_template_name: "{{ template_name_web }}"
+        launch_template_id: "{{ template_id_web }}"       
+      desired_capacity: 2      
+      min_size: 2
+      max_size: 6
+      state: present     
+      tags:
+        - name: web_asg
+    register: web_asg_result
+
+  - name: Configure Was Auto Scaling Group and perform rolling deploy
+    amazon.aws.autoscaling_group:  
+      region: "{{ region }}"
+      name: "{{ autoscaling_name_was }}"      
+#      launch_config_name: "{{ launch_template_name_was }}"   
+      vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
+      launch_template: 
+        version: '1'
+        launch_template_name: "{{ template_name_was }}"
+        launch_template_id: "{{ template_id_was }}"
+      desired_capacity: 2
+      min_size: 2
+      max_size: 6
+      state: present   
+      tags:
+        - name: was_asg 
+    register: was_asg_result
+
+#################################################
+############  vim load_balancer.yml  ############
+#################################################
+
+############ create a target group for external lb ###########
+  - name: Create web Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_web }}"
+      protocol: HTTP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_web_result      
+
+############ target attach to external target group ###########
+  - name: Register web Auto Scaling Group with web Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_web_result.target_group_name }}"
+      target_id: "{{ web_asg_result.instances[1] }}"
+      state: "{{ state }}"      
+
+############ create an Elastic Load Balancer for web_asg ###########
+  - name: Configure external Elastic Load Balancers
+    amazon.aws.elb_application_lb:
+      region: "{{ region }}"
+      name: "{{ lb_name_external }}"
+      state: "{{ state }}"
+      subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}" ]
+      security_groups: [ "{{ security_group_exlb_result.group_id }}" ]
+      scheme: "internet-facing"
+      listeners:
+        - Protocol: HTTP
+          Port: 80
+          DefaultActions: 
+            - Type: "forward"
+              TargetGroupName: "{{ tg_web_result.target_group_name }}"       
+    register: exlb_result       
+
+############ create a target group for internal lb ###########
+  - name: Create was Target Group
+    community.aws.elb_target_group:
+      region: "{{ region }}"
+      name: "{{ target_group_was }}"
+      protocol: TCP
+      port: 80
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      state: "{{ state }}"
+      health_check_protocol: HTTP
+      health_check_port: 80
+      health_check_path: "/"
+    register: tg_was_result      
+
+############ target attach to internal target group ###########
+  - name: Register was Auto Scaling Group with was Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[0] }}"
+      state: "{{ state }}"
+  - name: Register Auto Scaling Group with Target Group
+    community.aws.elb_target:
+      target_group_name: "{{ tg_was_result.target_group_name }}"
+      target_id: "{{ was_asg_result.instances[1] }}"
+      state: "{{ state }}"      
+
+
+############ create an Elastic Load Balancer for was_asg ###########
+  - name: Configure internal Elastic Load Balancers
+    community.aws.elb_network_lb:
+      name: "{{ lb_name_internal }}"
+      subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}" ]
+#      security_groups: [ "{{ security_group_inlb_result.group_id }}" ]
+      state: "{{ state }}"
+      scheme: "internal"
+      listeners:
+        - Protocol: TCP
+          Port: 80 
+          DefaultActions:
+            - Type: forward 
+              TargetGroupName: "{{ tg_was_result.target_group_name }}"
+    register: inlb_result
+
+#################################################
+############  vim cloudwatch.yml  ###############
+#################################################
+
+############ create auto-scaling policy ###########
+  - name: Configure Scaling Policies
+    community.aws.autoscaling_policy:
+      region: "{{ region }}"
+      name: "{{ as_poliy_name_web }}"
+      asg_name: "{{ web_asg_result.auto_scaling_group_name }}"
+      state: "{{ state }}"
+      adjustment_type: "{{ item.adjustment_type }}"
+      min_adjustment_step: "{{ item.min_adjustment_step }}"
+      scaling_adjustment: "{{ item.scaling_adjustment }}"
+      cooldown: "{{ item.cooldown }}"
+    with_items:
+      - name: "Increase Group Size"
+        adjustment_type: "ChangeInCapacity"
+        scaling_adjustment: +1
+        min_adjustment_step: 1
+        cooldown: 60
+      - name: "Decrease Group Size"
+        adjustment_type: "ChangeInCapacity"
+        scaling_adjustment: -1
+        min_adjustment_step: 1
+        cooldown: 60      
+    register: as_policy_result 
+
+############ metric alarm1 cpu =< 50 ###########
+  - name: Configure Metric Alarms and link to Scaling Policies
+    amazon.aws.cloudwatch_metric_alarm:
+      region: "{{ region }}"
+      name: "{{ metric_alarm_web1 }}"
+      state: "{{ state }}"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      comparison: "GreaterThanOrEqualToThreshold"
+      threshold: 50.0
+      period: 60
+      evaluation_periods: 5
+      unit: "Percent"
+      dimensions:
+        AutoScalingGroupName: "{{ web_asg_result.auto_scaling_group_name }}"
+      alarm_actions: "{{ as_policy_result.results[0].arn }}"   
+    register: web1_metric_alarm_result 
+
+############ metric alarm2 cpu => 20 ###########
+  - name: Configure Metric Alarms and link to Scaling Policies
+    amazon.aws.cloudwatch_metric_alarm:
+      region: "{{ region }}"
+      name: "{{ metric_alarm_web2 }}"
+      state: "{{ state }}"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      comparison: "LessThanOrEqualToThreshold"
+      threshold: 20.0
+      period: 60
+      evaluation_periods: 5
+      unit: "Percent"
+      dimensions:
+        AutoScalingGroupName: "{{ web_asg_result.auto_scaling_group_name }}"
+      alarm_actions: "{{ as_policy_result.results[1].arn }}"   
+    register: web2_metric_alarm_result        
+
+
+
+#################################################
+################  vim efs.yml  ###################
+#################################################     
+
+############ create efs for web ###########
+  - name: create efs for web
+    community.aws.efs:
+      state: "{{ state }}"
+      name: "{{ efs_name_web }}"
+      targets:
+        - subnet_id: "{{ subnet_web1_result.subnet.id }}"
+          security_groups: ["{{ security_group_efs_web_result.group_id }}"]
+        - subnet_id: "{{ subnet_web2_result.subnet.id }}"
+          security_groups: ["{{ security_group_efs_web_result.group_id }}"] 
+
+############ create efs for was ###########
+  - name: create efs for was
+    community.aws.efs:
+      state: "{{ state }}"
+      name: "{{ efs_name_was }}"
+      targets:
+        - subnet_id: "{{ subnet_was1_result.subnet.id }}"
+          security_groups: ["{{ security_group_efs_was_result.group_id }}"]
+        - subnet_id: "{{ subnet_was2_result.subnet.id }}"
+          security_groups: ["{{ security_group_efs_was_result.group_id }}"]   
+
+#########################################################################
+################  basition setting for ansible, awscli  ###################
+#########################################################################
+
+
+- hosts: tags_Name_project_ec2_bastion
+  tasks:
+  
+############ dnf install  ansible, python ###########
+    - name: Install the latest version of ansible, pyhon3-pip
+      ansible.builtin.dnf:
+        name:
+          - ansible-core
+          - python3-pip
+          - python-pip
+          - python3-botocore
+        state: latest
+
+############ pip install boto, ansible ###########
+    - name: Install multi python packages wiht boto3
+      ansible.builtin.pip:
+        name:
+          - boto3
+          - boto
+          - ansible
+        state: latest
+
+############ ec2-user join group wheel ###########        
+    - name: Add the user 'ec2-user' with a bash shell, appending the group 'wheel' 
+      ansible.builtin.user:
+        name: ec2-user
+        shell: /bin/bash
+        groups: wheel       
+        append: yes        
+
+############ create direrctory ansible ###########        
+    - name: Create a directory "ansible"
+      ansible.builtin.file:
+        path: /home/ec2-user/ansible
+        state: directory
+        mode: '0755'
+        owner: ec2-user
+        group: ec2-user
+
+############ copy sudoers file ###########        
+    - name: Copy a "sudoers" file into place for ansible
+      ansible.builtin.copy:
+        src: ./sudoers
+        dest: /etc/sudoers
+        owner: root
+        group: root
+
+############ copy ansible inventory file ###########        
+    - name: Copy a "aws_ec2.yaml" file into place for ansible
+      ansible.builtin.copy:
+        src: ./aws_ec2.yaml
+        dest: /home/ec2-user/ansible
+        owner: ec2-user
+        group: ec2-user
+        
+############ copy ansible.cfg file ###########        
+    - name: Copy a "ansible.cfg" file into place for ansible
+      ansible.builtin.copy:
+        src: ./ansible.cfg
+        dest: /home/ec2-user/ansible/
+        owner: ec2-user
+        group: ec2-user        
+
+############ copy ec2-key ###########
+    - name: Copy a "ec2-key" file into place for ansible
+      ansible.builtin.copy:
+        src: ./ec2-key.pem
+        dest: /home/ec2-user/ansible
+        owner: ec2-user
+        group: ec2-user
+        mode: '0400'
+
+############ download aws cli by curl ###########        
+    - name: download aws cli by curl
+      ansible.builtin.command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+
+############ unzip aws cli ###########      
+    - name: unzip aws cli 
+      ansible.builtin.command: unzip awscliv2.zip 
+
+############ install aws cli ###########      
+    - name: install aws cli
+      ansible.builtin.command: ./aws/install
+
+############ create directory .aws for configure ###########      
+    - name: Create a directory ".aws"
+      ansible.builtin.file:
+        path: /home/ec2-user/.aws
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+        
+############ copy aws config file ###########        
+    - name: Copy a "aws config" file into place for aws cli
+      ansible.builtin.copy:
+        src: ~/.aws/config
+        dest: /home/ec2-user/.aws/config
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+############ copy aws credentials file ###########        
+    - name: Copy a "aws credentials" file into place for aws cli
+      ansible.builtin.copy:
+        src: ~/.aws/credentials
+        dest: /home/ec2-user/.aws/credentials
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+############ copy private_ec2_playbook file ###########        
+    - name: Copy a "aws credentials" file into place for aws cli
+      ansible.builtin.copy:
+        src: ./private_ec2_playbook.yaml
+        dest: /home/ec2-user/ansible/
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'            
