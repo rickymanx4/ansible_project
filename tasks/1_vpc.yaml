@@ -1,0 +1,344 @@
+#######################################
+############  vim vpc.yml  ############
+#######################################
+---
+- hosts: localhost
+  gather_facts: no
+  connection: localhost
+  vars_files:
+    - ./vars.yaml
+
+  tasks:
+########### create a vpc with name, cidr block,dns support, and tenancy ###########
+  - name: create a new ec2 VPC    
+    amazon.aws.ec2_vpc_net:     
+      name: "{{ vpc_name }}" 
+      cidr_block: "{{ vpcCidrBlock }}"
+      region: "{{ region }}"
+      # enable dns support 
+      dns_support: yes
+      # enable dns hostnames
+      dns_hostnames: yes
+      tenancy: default
+      state: "{{ state }}"
+    register: ec2_vpc_net_result
+
+############ create an internet gateway for the vpc ###########   
+  - name: create ec2 vpc internet gateway           
+    amazon.aws.ec2_vpc_igw:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}" 
+      tags:
+        Name: "{{ igw_name }}"
+    register: igw_result
+
+############ create the subnet for the vpc with a cidr block ###########   
+  - name: create ec2 vpc subnet_pub1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub1 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub1 }}"
+    register: subnet_pub1_result
+
+  - name: create ec2 vpc subnet_pub2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub2 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub2 }}"
+    register: subnet_pub2_result        
+
+  - name: create ec2 vpc subnet_web1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web1 }}"
+    register: subnet_web1_result
+
+  - name: create ec2 vpc subnet_web2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web2 }}"
+    register: subnet_web2_result    
+
+  - name: create ec2 vpc subnet_was1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was1 }}"
+    register: subnet_was1_result    
+
+  - name: create ec2 vpc subnet_was2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was2 }}"
+    register: subnet_was2_result    
+
+  - name: create ec2 vpc subnet_db1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db1 }}"
+    register: subnet_db1_result    
+
+  - name: create ec2 vpc subnet_db2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db2 }}"
+    register: subnet_db2_result    
+
+############ create a security group for the vpc ###########
+  - name: create ec2-bastion security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_bastion }}"
+      description: "{{ security_group_name_bastion }}"
+      tags:
+        Name: "{{ security_group_name_bastion  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 80        
+    register: security_group_bastion_result
+
+  - name: create ec2-external-load-balancer security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_exlb }}"
+      description: "{{ security_group_name_exlb }}"
+      tags:
+        Name: "{{ security_group_name_exlb }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 80
+        cidr_ip: "{{ destinationCidrBlock }}"
+        rule_desc: allow all on port 80        
+    register: security_group_exlb_result
+
+  - name: create ec2-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_web }}"
+      description: "{{ security_group_name_web }}"
+      tags:
+        Name: "{{ security_group_name_web }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_exlb }}"
+        rule_desc: allow all on port 80        
+    register: security_group_web_result    
+
+  - name: create ec2-internal-load-balancer security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_inlb }}"
+      description: "{{ security_group_name_inlb }}"
+      tags:
+        Name: "{{ security_group_name_inlb }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_web }}"
+        rule_desc: allow all on port 80        
+    register: security_group_inlb_result            
+
+  - name: create ec2-was security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_was }}"
+      description: "{{ security_group_name_was }}"
+      tags:
+        Name: "{{ security_group_name_was  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 22
+        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+        rule_desc: allow all on port 22
+      - proto: tcp
+        ports:
+        - 80
+        group_name: "{{ security_group_name_inlb }}"
+        rule_desc: allow all on port 80        
+    register: security_group_was_result
+
+  - name: create ec2-db security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_db }}"
+      description: "{{ security_group_name_db }}"
+      tags:
+        Name: "{{ security_group_name_db  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 3306
+        group_name: "{{ security_group_name_was }}"
+        rule_desc: allow all on port 3306      
+    register: security_group_db_result
+
+  - name: create ec2-efs-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_efs_web }}"
+      description: "{{ security_group_name_efs_web }}"
+      tags:
+        Name: "{{ security_group_name_efs_web  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 2049
+        group_name: "{{ security_group_name_web }}"
+        rule_desc: allow all on port 2049      
+    register: security_group_efs_web_result
+
+  - name: create ec2-efs-web security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_efs_was }}"
+      description: "{{ security_group_name_efs_was }}"
+      tags:
+        Name: "{{ security_group_name_efs_was  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 2049
+        group_name: "{{ security_group_name_was }}"
+        rule_desc: allow all on port 2049      
+    register: security_group_efs_was_result
+
+############ create a elastic IP for nat gateway ###########
+  - name: allocate a new elastic IP 
+    amazon.aws.ec2_eip:
+      state: "{{ state }}"
+      tags:
+        name:  "{{ eip_name }}"
+    register: eip_result
+
+############ create a nat gateway for private routing table ###########
+  - name: Create new nat gateway 
+    amazon.aws.ec2_vpc_nat_gateway:
+      state: "{{ state }}"
+      subnet_id: "{{ subnet_pub2_result.subnet.id }}"
+      eip_address: "{{ eip_result.public_ip }}"
+      region: "{{ region }}"
+      tags:
+        name:  "{{ nat_gateway_name }}"      
+    register: nat_gateway_result
+
+# create route table and connect subnet to routes
+  - name: create ec2 VPC public subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_public}}"
+      subnets: [ "{{ subnet_pub1_result.subnet.id }}", "{{ subnet_pub2_result.subnet.id }}"]
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          gateway_id: "{{ igw_result.gateway_id }}"
+    register: public_rt_result
+
+  - name: create ec2 VPC web subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_web }}"
+      subnets: [ "{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]      
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          #gateway_id: "{{ test_nat_gateway_id }}"
+          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+    register: web_rt_result
+
+  - name: create ec2 VPC was subnet route table    
+    amazon.aws.ec2_vpc_route_table:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      tags:
+        Name: "{{ route_table_name_was }}"
+      subnets: [ "{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]      
+      routes:
+        - dest: "{{ destinationCidrBlock }}" 
+          #gateway_id: "{{ test_nat_gateway_id }}"
+          gateway_id: "{{ nat_gateway_result.nat_gateway_id }}"
+    register: was_rt_result

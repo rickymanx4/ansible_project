@@ -16,5 +16,5 @@
       image_id: "{{ images }}"
       tags:
         Name: "{{ ec2_name_bastion }}"
-      user_data: "{{ bastion_data }}"
+      #user_data: "{{ bastion_data }}"
     register: ec2_bastion_result

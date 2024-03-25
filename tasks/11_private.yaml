@@ -6,6 +6,7 @@
 - hosts: 
   - web_asg
   - was_asg
+  gather_facts: yes
   vars: 
     ansible_ssh_common_args:
       -o ProxyCommand="ssh
@@ -14,14 +15,6 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"   
   tasks:
-############ dnf install python, nfs, efs utils ###########  
-    - name: Install the latest version of ansible, pyhon3-pip
-      ansible.builtin.dnf:
-        name:          
-          - python3*
-          - amazon-efs-utils
-          - nfs-utils
-        state: latest   
 
 ############ ec2-user join group whell ###########
     - name: Add the user 'ec2-user' with a bash shell, appending the group 'wheel' 
@@ -46,44 +39,39 @@
         state: directory
         mode: '0755'
 
-############ Copy a "authorized_key" file into place for ansible ###########        
-    - name: Copy a "authorized_key" file into place for ansible
-      ansible.builtin.copy:
-        src: ~/.ssh/authorized_keys
-        dest: /home/ec2-user/ansible
-        owner: ec2-user
-        group: ec2-user
-        mode: '0600'
 
-############ create a "efs" directory ###########                
-    - name: Create a directory "efs"
-      ansible.builtin.file:
-        path: /home/ec2-user/efs
-        state: directory
-        mode: '0755'
+############ dnf install python, nfs, efs utils ###########  
+    - name: Install the latest version of ansible, pyhon3-pip
+      ansible.builtin.dnf:
+        name:          
+          - python3-pip
+          - amazon-efs-utils
+          - nfs-utils
+        state: latest           
 
 #########################################################################
 ################  private ec2(web) ansible ###########################
 #########################################################################
-- hosts: web_asg
+
   tasks: 
 ############ mount efs file system in web ec2 ###########                  
   - name: Mount up device by UUID
+    hosts: web_asg  
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: fs-087c19ca82ab30a43.efs.ap-northeast-1.amazonaws.com:/
+      src: "{{ web_efs_result.file_system_id }}"
       fstype: nfs4
       state: mounted
 
 #########################################################################
 ################  private ec2(was) ansible ###########################
 #########################################################################      
-- hosts: was_asg
-  tasks: 
+
 ############ mount efs file system in was ec2 ###########                  
   - name: Mount up device by UUID
+    hosts: was_asg    
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: fs-0d20f89c3d38351cd.efs.ap-northeast-1.amazonaws.com:/
+      src: "{{ was_efs_result.file_system_id }}"
       fstype: nfs4
       state: mounted
