@@ -34,3 +34,5 @@
     src: "{{ was_efs_result.file_system_id }}"
     fstype: nfs4
     state: mounted         
+
+    
