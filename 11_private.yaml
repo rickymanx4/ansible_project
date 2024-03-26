@@ -66,11 +66,13 @@
       name:
         - flask
         - gunicorn
-        - requests        
         - pymysql
         - flask-cors
       state: latest      
 
+############ pip3 install requests ###########  
+  - name: pip3 install requests
+    ansible.builtin.shell: pip3 install requests
 
 #########################################################################
 ################  private ec2(web) ansible ###########################
