@@ -4,7 +4,7 @@
 
 
 - hosts: project_ec2_bastion
-tasks:
+  tasks:
 
 ############ dnf install  ansible, python ###########
   - name: Install the latest version of ansible, pyhon3-pip

@@ -75,8 +75,8 @@
 ################  private ec2(web) ansible ###########################
 #########################################################################
 
-- hosts: 
-  - web_asg
+- hosts: web_asg
+  gather_facts: no
 ############ mount efs file system in web ec2 ###########                  
   # - name: Mount up device by UUID
   #   hosts: web_asg  
@@ -105,9 +105,8 @@
 #########################################################################      
 
 
-- hosts: 
-  - was_asg
-
+- hosts: was_asg
+  gather_facts: no
 ############ mount efs file system in was ec2 ###########                      
   # - name: Mount up device by UUID
   #   hosts: was_asg    
