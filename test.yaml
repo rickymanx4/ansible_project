@@ -37,6 +37,5 @@
       master_user_password: "my_password"
       db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
-      wait_for_completion: yes
       tags:
         - name: "{{ rds_name_01 }}"
