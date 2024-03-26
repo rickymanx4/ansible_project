@@ -1,9 +1,9 @@
 ---
-- hosts: localhost  
+- hosts: localhost
   gather_facts: no
   connection: localhost
-  vars:
-    - ./vars.yaml   
+  vars_files:
+    - ./vars.yaml  
 
   tasks:
   - name: Include task list in play 1~9
