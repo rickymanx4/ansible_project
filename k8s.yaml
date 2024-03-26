@@ -1,18 +1,7 @@
 plugin: kubernetes.core.k8s
 connections:
-  - namespaces:
-    - test
+  - host:
+    - 100.100.20.16
+    - 100.100.20.218  
 
-filters:
-  instance-state-name: running
-  node_group:
-    - node2
-  labels:
-    - eks.amazonaws.com/nodegroup: node2  
-
-keyed_groups:
-  - prefix: eks.amazonaws.com/nodegroup
-    key: labels
-
-  - key: tags.name
-    separator: ''    
+    
