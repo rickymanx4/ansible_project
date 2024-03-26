@@ -4,90 +4,30 @@
   connection: localhost
   vars_files:
     - ./vars.yaml  
+  tasks:  
+    - name: create efs for web
+      community.aws.efs:
+        state: "present"
+        name: "efs_name_web"
+        targets:
+          - subnet_id: "subnet-0d93739b4da99a8d5"
+            security_groups: 
+              - "sg-02396524debb6de38"
+          - subnet_id: "subnet-02be0fb335a7482fb"
+            security_groups: 
+              - "sg-02396524debb6de38"
+      register: web_efs_result
 
-  tasks:
-  - name: Include task list in play vpc
-    ansible.builtin.import_tasks:
-      file: "./tasks/1_vpc.yaml"
-    
-  - name: Include task list in play subnet
-    ansible.builtin.import_tasks:
-      file: "./tasks/2_subnet.yaml"    
-
-  - name: Include task list in play security_group
-    ansible.builtin.import_tasks:
-      file: "./tasks/3_security_group.yaml" 
-
-  - name: Include task list in play routing_tables
-    ansible.builtin.import_tasks:
-      file: "./tasks/4_routing_tables.yaml" 
-
-  - name: Include task list in play ec2_bastion
-    ansible.builtin.import_tasks:
-      file: "./tasks/5_ec2.yaml"       
-
-  - name: Include task list in play auto_scaling_group
-    ansible.builtin.import_tasks:
-      file: "./tasks/6_auto_scaling_group.yaml"   
-
-  - name: Include task list in play load_balancer
-    ansible.builtin.import_tasks:
-      file: "./tasks/7_load_balancer.yaml"     
-
-  - name: Include task list in play cloud watch
-    ansible.builtin.import_tasks:
-      file: "./tasks/8_cloudwatch.yaml"   
-
-#  - name: Include task list in play efs
-#    ansible.builtin.import_tasks:
-#      file: "./tasks/9_efs.yaml"                      
-
-- hosts: project_ec2_bastion
-  tasks:
-  - name: Include task list in play bastion for ansible
-    ansible.builtin.import_tasks:
-      file: ./tasks/10_bastion.yaml 
-
-- hosts: 
-  - web_asg
-  - was_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
-  tasks:
-  - name: Include task list in play private ec2 default setting
-    ansible.builtin.import_tasks:
-      file: ./tasks/11_private.yaml       
-
-- hosts: web_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
-  tasks:
-  - name: Include task list in play webserver service
-    ansible.builtin.import_tasks:
-      file: ./tasks/12_webservice.yaml     
-
-- hosts: was_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
-  tasks:
-  - name: Include task list in play wasserver service
-    ansible.builtin.import_tasks:
-      file: ./tasks/13_wasservice.yaml
+   ############ create efs for was ###########
+    - name: create efs for was
+      community.aws.efs:
+        state: present
+        name: efs_name_was 
+        targets:
+          - subnet_id: "subnet-0173fef119bf747cb"
+            security_groups: 
+              - "sg-0f40fdb042c96e5dc" 
+          - subnet_id: "subnet-02f6f9e0d6880a49c"
+            security_groups: 
+              - "sg-0f40fdb042c96e5dc"
+      register: was_efs_result

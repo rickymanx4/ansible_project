@@ -8,11 +8,11 @@
     region: "{{ region }}"
     name: "{{ target_group_web }}"
     protocol: HTTP
-    port: 5000
+    port: 80
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
     state: "{{ state }}"
     health_check_protocol: HTTP
-    health_check_port: 5000
+    health_check_port: 80
     health_check_path: "/"
   register: tg_web_result      
 
@@ -39,10 +39,15 @@
     scheme: "internet-facing"
     listeners:
       - Protocol: HTTP
-        Port: 5000
+        Port: 80
         DefaultActions: 
           - Type: "forward"
             TargetGroupName: "{{ tg_web_result.target_group_name }}"       
+      - Protocol: HTTP
+        Port: 5000
+        DefaultActions: 
+          - Type: "forward"
+            TargetGroupName: "{{ tg_web_result.target_group_name }}"  
   register: exlb_result       
 
 ############ create a target group for internal lb ###########
@@ -102,3 +107,8 @@
         DefaultActions: 
           - Type: "forward"
             TargetGroupName: "{{ tg_was_result.target_group_name }}"  
+      - Protocol: HTTP
+        Port: 80
+        DefaultActions: 
+          - Type: "forward"
+            TargetGroupName: "{{ tg_was_result.target_group_name }}"             
