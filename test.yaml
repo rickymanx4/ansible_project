@@ -6,24 +6,41 @@
     - ./vars.yaml  
 
   tasks:
-  - name: Include task list in play 1~9
+  - name: Include task list in play vpc
     ansible.builtin.import_tasks:
       file: "./tasks/1_vpc.yaml"
     
-  - name: Include task list in play 1~9
+  - name: Include task list in play subnet
     ansible.builtin.import_tasks:
-      file: "{{ item }}"
-    loop:
-      - ./tasks/1_vpc.yaml      
-      - ./tasks/2_subnet.yaml      
-      - ./tasks/3_security_group.yaml   
-      - ./tasks/4_routing_tables.yaml   
-      - ./tasks/5_ec2.yaml   
-      - ./tasks/6_auto_scaling_group.yaml   
-      - ./tasks/7_load_balancer.yaml   
-      - ./tasks/8_cloudwatch.yaml   
-      - ./tasks/9_efs.yaml   
+      file: "./tasks/2_subnet.yaml"    
 
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/3_security_group.yaml" 
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/4_routing_tables.yaml" 
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/5_ec2.yaml"       
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/6_auto_scaling_group.yaml"   
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/7_load_balancer.yaml"     
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/8_cloudwatch.yaml"   
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/9_efs.yaml"                      
 
 - hosts: project_ec2_bastion
   tasks:
