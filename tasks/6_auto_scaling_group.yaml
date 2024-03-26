@@ -1,37 +1,37 @@
 ############ create web/was auto scaling group ###########
-  - name: Configure Web Auto Scaling Group and perform rolling deploy
-    amazon.aws.autoscaling_group:   
-      region: "{{ region }}"
-      name: "{{ autoscaling_name_web }}"      
+- name: Configure Web Auto Scaling Group and perform rolling deploy
+  amazon.aws.autoscaling_group:   
+    region: "{{ region }}"
+    name: "{{ autoscaling_name_web }}"      
 #      launch_config_name: "{{ launch_template_name_web }}"
-      vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]
-      security_groups: [ "{{ security_group_web_result.group_id }}" ]           
-      launch_template: 
-        version: '1'        
-        launch_template_name: "{{ template_name_web }}"
-        launch_template_id: "{{ template_id_web }}"       
-      desired_capacity: 2      
-      min_size: 2
-      max_size: 6
-      state: present     
-      tags:
-        - name: web_asg
-    register: web_asg_result
+    vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]
+    security_groups: [ "{{ security_group_web_result.group_id }}" ]           
+    launch_template: 
+      version: '1'        
+      launch_template_name: "{{ template_name_web }}"
+      launch_template_id: "{{ template_id_web }}"       
+    desired_capacity: 2      
+    min_size: 2
+    max_size: 6
+    state: present     
+    tags:
+      - name: web_asg
+  register: web_asg_result
 
-  - name: Configure Was Auto Scaling Group and perform rolling deploy
-    amazon.aws.autoscaling_group:  
-      region: "{{ region }}"
-      name: "{{ autoscaling_name_was }}"      
+- name: Configure Was Auto Scaling Group and perform rolling deploy
+  amazon.aws.autoscaling_group:  
+    region: "{{ region }}"
+    name: "{{ autoscaling_name_was }}"      
 #      launch_config_name: "{{ launch_template_name_was }}"   
-      vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
-      launch_template: 
-        version: '1'
-        launch_template_name: "{{ template_name_was }}"
-        launch_template_id: "{{ template_id_was }}"
-      desired_capacity: 2
-      min_size: 2
-      max_size: 6
-      state: present   
-      tags:
-        - name: was_asg 
-    register: was_asg_result
+    vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
+    launch_template: 
+      version: '1'
+      launch_template_name: "{{ template_name_was }}"
+      launch_template_id: "{{ template_id_was }}"
+    desired_capacity: 2
+    min_size: 2
+    max_size: 6
+    state: present   
+    tags:
+      - name: was_asg 
+  register: was_asg_result

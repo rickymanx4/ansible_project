@@ -3,21 +3,23 @@ plugin: aws_ec2
 regions:  
   - ap-northeast-1
 
-cache: true
+cache: false
 
-cache_max_age: 3600
+  #cache_max_age: 3600
 
 filters:
+  instance-state-name: running
   tag:name:
-    - project_ec2_bastion
-    - web_asg
     - was_asg
-  instance-state-name: running 
+    - web_asg
+    - project_ec2_bastion
 
 keyed_groups:
+  #  - prefix: tags
+  #    key: tags
+
   - key: tags.name
     separator: ''
-
 hostnames:
   - network-interface.association.public-ip
   - network-interface.addresses.private-ip-address

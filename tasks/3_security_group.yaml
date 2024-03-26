@@ -1,151 +1,151 @@
 ############ create a security group for the vpc ###########
-  - name: create ec2-bastion security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_bastion }}"
-      description: "{{ security_group_name_bastion }}"
-      tags:
-        Name: "{{ security_group_name_bastion  }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 22
-        cidr_ip: "{{ destinationCidrBlock }}"
-        rule_desc: allow all on port 22
-      - proto: tcp
-        ports:
-        - 80
-        cidr_ip: "{{ destinationCidrBlock }}"
-        rule_desc: allow all on port 80        
-    register: security_group_bastion_result
+- name: create ec2-bastion security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_bastion }}"
+    description: "{{ security_group_name_bastion }}"
+    tags:
+      Name: "{{ security_group_name_bastion  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 22
+      cidr_ip: "{{ destinationCidrBlock }}"
+      rule_desc: allow all on port 22
+    - proto: tcp
+      ports:
+      - 80
+      cidr_ip: "{{ destinationCidrBlock }}"
+      rule_desc: allow all on port 80        
+  register: security_group_bastion_result
 
-  - name: create ec2-external-load-balancer security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_exlb }}"
-      description: "{{ security_group_name_exlb }}"
-      tags:
-        Name: "{{ security_group_name_exlb }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 80
-        cidr_ip: "{{ destinationCidrBlock }}"
-        rule_desc: allow all on port 80        
-    register: security_group_exlb_result
+- name: create ec2-external-load-balancer security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_exlb }}"
+    description: "{{ security_group_name_exlb }}"
+    tags:
+      Name: "{{ security_group_name_exlb }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 80
+      cidr_ip: "{{ destinationCidrBlock }}"
+      rule_desc: allow all on port 80        
+  register: security_group_exlb_result
 
-  - name: create ec2-web security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_web }}"
-      description: "{{ security_group_name_web }}"
-      tags:
-        Name: "{{ security_group_name_web }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 22
-        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
-        rule_desc: allow all on port 22
-      - proto: tcp
-        ports:
-        - 80
-        group_name: "{{ security_group_name_exlb }}"
-        rule_desc: allow all on port 80        
-    register: security_group_web_result    
+- name: create ec2-web security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_web }}"
+    description: "{{ security_group_name_web }}"
+    tags:
+      Name: "{{ security_group_name_web }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 22
+      cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+      rule_desc: allow all on port 22
+    - proto: tcp
+      ports:
+      - 80
+      group_name: "{{ security_group_name_exlb }}"
+      rule_desc: allow all on port 80        
+  register: security_group_web_result    
 
-  - name: create ec2-internal-load-balancer security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_inlb }}"
-      description: "{{ security_group_name_inlb }}"
-      tags:
-        Name: "{{ security_group_name_inlb }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 80
-        group_name: "{{ security_group_name_web }}"
-        rule_desc: allow all on port 80        
-    register: security_group_inlb_result            
+- name: create ec2-internal-load-balancer security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_inlb }}"
+    description: "{{ security_group_name_inlb }}"
+    tags:
+      Name: "{{ security_group_name_inlb }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 80
+      group_name: "{{ security_group_name_web }}"
+      rule_desc: allow all on port 80        
+  register: security_group_inlb_result            
 
-  - name: create ec2-was security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_was }}"
-      description: "{{ security_group_name_was }}"
-      tags:
-        Name: "{{ security_group_name_was  }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 22
-        cidr_ip: "{{ subNetCidrBlock_pub1 }}"
-        rule_desc: allow all on port 22
-      - proto: tcp
-        ports:
-        - 80
-        group_name: "{{ security_group_name_inlb }}"
-        rule_desc: allow all on port 80        
-    register: security_group_was_result
+- name: create ec2-was security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_was }}"
+    description: "{{ security_group_name_was }}"
+    tags:
+      Name: "{{ security_group_name_was  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 22
+      cidr_ip: "{{ subNetCidrBlock_pub1 }}"
+      rule_desc: allow all on port 22
+    - proto: tcp
+      ports:
+      - 80
+      group_name: "{{ security_group_name_inlb }}"
+      rule_desc: allow all on port 80        
+  register: security_group_was_result
 
-  - name: create ec2-db security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_db }}"
-      description: "{{ security_group_name_db }}"
-      tags:
-        Name: "{{ security_group_name_db  }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 3306
-        group_name: "{{ security_group_name_was }}"
-        rule_desc: allow all on port 3306      
-    register: security_group_db_result
+- name: create ec2-db security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_db }}"
+    description: "{{ security_group_name_db }}"
+    tags:
+      Name: "{{ security_group_name_db  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_was }}"
+      rule_desc: allow all on port 3306      
+  register: security_group_db_result
 
-  - name: create ec2-efs-web security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_efs_web }}"
-      description: "{{ security_group_name_efs_web }}"
-      tags:
-        Name: "{{ security_group_name_efs_web  }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 2049
-        group_name: "{{ security_group_name_web }}"
-        rule_desc: allow all on port 2049      
-    register: security_group_efs_web_result
+- name: create ec2-efs-web security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_efs_web }}"
+    description: "{{ security_group_name_efs_web }}"
+    tags:
+      Name: "{{ security_group_name_efs_web  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 2049
+      group_name: "{{ security_group_name_web }}"
+      rule_desc: allow all on port 2049      
+  register: security_group_efs_web_result
 
-  - name: create ec2-efs-web security group
-    amazon.aws.ec2_group:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}"
-      name: "{{ security_group_name_efs_was }}"
-      description: "{{ security_group_name_efs_was }}"
-      tags:
-        Name: "{{ security_group_name_efs_was  }}"
-      rules:
-      - proto: tcp
-        ports:
-        - 2049
-        group_name: "{{ security_group_name_was }}"
-        rule_desc: allow all on port 2049      
-    register: security_group_efs_was_result
+- name: create ec2-efs-web security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_efs_was }}"
+    description: "{{ security_group_name_efs_was }}"
+    tags:
+      Name: "{{ security_group_name_efs_was  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 2049
+      group_name: "{{ security_group_name_was }}"
+      rule_desc: allow all on port 2049      
+  register: security_group_efs_was_result

@@ -3,18 +3,18 @@
 #######################################
 
 ############ create a ec2 for bastion ###########
-  - name: start an instance with a public IP address
-    amazon.aws.ec2_instance:
+- name: start an instance with a public IP address
+  amazon.aws.ec2_instance:
+    name: "{{ ec2_name_bastion }}"
+    key_name: "{{ keys }}"
+    instance_type: "{{ instancesize_bastion }}"
+    security_group: "{{ security_group_bastion_result.group_id }}"    
+    vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+    instance_role: "{{ instance_role }}"
+    network:
+      assign_public_ip: true    
+    image_id: "{{ images }}"
+    tags:
       name: "{{ ec2_name_bastion }}"
-      key_name: "{{ keys }}"
-      instance_type: "{{ instancesize_bastion }}"
-      security_group: "{{ security_group_bastion_result.group_id }}"    
-      vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
-      instance_role: "{{ instance_role }}"
-      network:
-        assign_public_ip: true    
-      image_id: "{{ images }}"
-      tags:
-        name: "{{ ec2_name_bastion }}"
-      #user_data: "{{ bastion_data }}"
-    register: ec2_bastion_result
+    #user_data: "{{ bastion_data }}"
+  register: ec2_bastion_result
