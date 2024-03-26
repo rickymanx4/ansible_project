@@ -48,7 +48,7 @@
       mode: '0755'
 
 ############ dnf update ###########  
-  - name: Install the latest version of ansible, pyhon3-pip
+  - name: dnf update
     ansible.builtin.shell: dnf update      
 
 ############ dnf install python, nfs, efs utils ###########  
@@ -65,11 +65,12 @@
     ansible.builtin.pip:
       name:
         - flask
-        - gunicorn
-        - flask-cors
+        - gunicorn        
         - requests
         - pymysql
+        - flask-cors
       state: latest
+
 
 #########################################################################
 ################  private ec2(web) ansible ###########################
