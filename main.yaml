@@ -4,6 +4,7 @@
   connection: localhost
   vars_files:
     - ./vars.yaml  
+  tasks:  
   - name: create efs for web
     community.aws.efs:
       state: "present"
