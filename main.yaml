@@ -14,7 +14,7 @@
           security_groups: ["sg-02396524debb6de38"]
         - subnet_id: "subnet-02be0fb335a7482fb"
           security_groups: ["sg-02396524debb6de38"]         
-     resigter: web_efs_result
+    resigter: web_efs_result
 
    ############ create efs for was ###########
   - name: create efs for was
@@ -26,5 +26,5 @@
           security_groups: ["sg-0f40fdb042c96e5dc"]
         - subnet_id: " subnet-02f6f9e0d6880a49c"
           security_groups: ["sg-0f40fdb042c96e5dc" ]           
-     resigter: was_efs_result
+    resigter: was_efs_result
 
