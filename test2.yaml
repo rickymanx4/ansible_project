@@ -56,10 +56,6 @@
       major_engine_version: "8.0.35"
       option_group_description: "test mysql option group"
       apply_immediately: true
-      options:
-        - option_name: MEMCACHED
-        - port: 3306
-        - vpc_security_group_memberships: [ "{{ subnet_db1_result.subnet.name }}" ]
     register: new_rds_mysql_option_group        
 
 # create RDS instance with mysql
