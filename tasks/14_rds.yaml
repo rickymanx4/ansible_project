@@ -1,0 +1,72 @@
+ #######################################
+  ############  vim rds.yml  ############
+  #######################################
+
+# create RDS Subnets for rds service
+- name: change a subnet group to RDS
+  amazon.aws.rds_subnet_group:
+    state: "{{ state }}"
+    name: rds_subnets
+    description: RDS subnet
+    subnets:
+      - "{{ subnet_db1_result.subnet.id }}"
+      - "{{ subnet_db2_result.subnet.id }}"
+
+
+- hosts: localhost
+  tasks:
+  - name: Create RDS instance
+    amazon.aws.rds_instance:
+      command: create
+      db_instance_identifier: "{{ rds_ec2_name_01 }}"
+      engine: mysql
+      engine_version: "8.0.35"
+      instance_class: db.t2.micro
+      allocated_storage: 20
+      db_name: "{{ rds_name_01 }}"
+      master_username: my_username
+      master_user_password: my_password
+      db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
+      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
+      wait_for_completion: yes
+      tags:
+        - Name:  "{{ rds_name_01 }}"
+
+# # Create an RDS Mysql Option group
+#   - name: Create an RDS Mysql option group
+#     amazon.aws.rds_option_group:
+#       state: "present"
+#       option_group_name: "mysql-option-group"
+#       engine_name: "mysql"
+#       major_engine_version: "8.0.35"
+#       option_group_description: "test mysql option group"
+#       apply_immediately: true
+#       options:
+#         - option_name: MEMCACHED
+#           port: 3306
+#           vpc_security_group_memberships:
+#             - "{{ subnet_db1_result.subnet.name }}"
+#     register: new_rds_mysql_option_group        
+
+# # create RDS instance with mysql
+#   - name: Create a DB instance 
+#     amazon.aws.rds_instance:
+#       aws_access_key: "{{ aws_access_key }}"
+#       aws_secret_key: "{{ aws_secret_key }}"    
+#       state: "{{ state }}"
+#       option_group_name: "mysql-option-group"
+#       iam_roles: 
+#         - role_arn: "{{ instance_role }}"
+#           feature_name: "wasstorage"
+#       db_name: "{{ rds_name_01 }}"
+#       db_instance_class: "db.m6gd.large"
+#       db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
+#       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+#       db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+#       master_username: "aduser"
+#       master_user_password: "pass1234@@"
+#       multi_az: true
+#       storage_type: "gp3"
+#       allocated_storage: 20             
+#       publicly_accessible: false
+#     register: rds_result        

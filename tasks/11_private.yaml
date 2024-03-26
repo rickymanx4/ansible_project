@@ -4,9 +4,9 @@
 
 
 - hosts: 
-- web_asg
-- was_asg
-  gather_facts: yes
+  - web_asg
+  - was_asg
+  gather_facts: no
   vars: 
     ansible_ssh_common_args:
       -o ProxyCommand="ssh
@@ -30,26 +30,9 @@
       path: /home/ec2-user/service
       state: directory
       mode: '0755'
-      owner: root
-      group: root
-
-############ copy sudoers file ###########
-  - name: Copy a "sudoers" file into place for ansible
-    ansible.builtin.copy:
-      src: ./sudoers
-      dest: /etc/sudoers
-      owner: root
-      group: root    
-
-############ create a .ssh directory  ###########
-  - name: Create a directory ".ssh"
-    ansible.builtin.file:
-      path: /home/ec2-user/.ssh
-      state: directory
-      mode: '0755'
 
 ############ dnf update ###########  
-  - name: Install the latest version of ansible, pyhon3-pip
+  - name: dnf update
     ansible.builtin.shell: dnf update      
 
 ############ dnf install python, nfs, efs utils ###########  
@@ -62,76 +45,15 @@
       state: latest        
 
 ############ pip install flask, gunicorn, flask-core, requests, pymysql ########### 
-  - name: Install python-pip packages with flaks service
+  - name: Install python-pip packages with flask service
     ansible.builtin.pip:
       name:
         - flask
         - gunicorn
-        - flask-cors
-        - requests
         - pymysql
-      state: latest
+        - flask-cors
+      state: latest      
 
-#########################################################################
-################  private ec2(web) ansible ###########################
-#########################################################################
-
-- hosts: 
-  - web_asg
-############ mount efs file system in web ec2 ###########                  
-  - name: Mount up device by UUID
-    hosts: web_asg  
-    ansible.posix.mount:
-      path: /home/ec2-user/efs
-      src: "{{ web_efs_result.file_system_id }}"
-      fstype: nfs4
-      state: mounted
-
-  - name: Copy a "blind_web" file into place for ansible
-    ansible.builtin.copy:
-      src: ./files/blind_web/*
-      dest: /home/ec2-user/service/
-      owner: root
-      group: root
-      mode: 755
-
-  - name: Copy a "bilind_web.service" file into place for ansible
-    ansible.builtin.copy:
-      src: ./files/blind_web.service
-      dest: /etc/systemd/system/blind_web.service
-      owner: root
-      group: root
-      mode: 755      
-
-#########################################################################
-################  private ec2(was) ansible ###########################
-#########################################################################      
-
-
-- hosts: 
-  - was_asg
-
-############ mount efs file system in was ec2 ###########                      
-  - name: Mount up device by UUID
-    hosts: was_asg    
-    ansible.posix.mount:
-      path: /home/ec2-user/efs
-      src: "{{ was_efs_result.file_system_id }}"
-      fstype: nfs4
-      state: mounted
-
-  - name: Copy a "blind_was" file into place for ansible
-    ansible.builtin.copy:
-      src: ./files/blind_was/*
-      dest: /home/ec2-user/service/
-      owner: root
-      group: root
-      mode: 755
-
-  - name: Copy a "bilind_was.service" file into place for ansible
-    ansible.builtin.copy:
-      src: ./files/blind_was.service
-      dest: /etc/systemd/system/blind_was.service
-      owner: root
-      group: root
-      mode: 755    
+############ pip3 install requests ###########  
+  - name: pip3 install requests
+    ansible.builtin.shell: pip3 install requests
