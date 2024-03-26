@@ -30,8 +30,7 @@
       path: /home/ec2-user/service
       state: directory
       mode: '0755'
-      owner: root
-      group: root
+
 
 ############ copy sudoers file ###########
   - name: Copy a "sudoers" file into place for ansible
@@ -91,8 +90,6 @@
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_web/
       dest: /home/ec2-user/service/
-      owner: root
-      group: root
       mode: 755
 
   - name: Copy a "bilind_web.service" file into place for ansible
@@ -124,8 +121,6 @@
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_was/
       dest: /home/ec2-user/service/
-      owner: root
-      group: root
       mode: 755
 
   - name: Copy a "bilind_was.service" file into place for ansible
