@@ -5,6 +5,10 @@
   tasks:
   - name: Include task list in play
     ansible.builtin.include_tasks:
+      file: ./tasks/1_vpc.yaml   
+
+  - name: Include task list in play
+    ansible.builtin.include_tasks:
       file: ./tasks/2_subnet.yaml    
 
   - name: Include task list in play
