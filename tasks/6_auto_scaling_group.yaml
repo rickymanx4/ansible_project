@@ -6,7 +6,7 @@
 #      launch_config_name: "{{ launch_template_name_web }}"
     vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]
     launch_template: 
-      version: '1'        
+      version: '3'        
       launch_template_name: "{{ template_name_web }}"
       launch_template_id: "{{ template_id_web }}"       
     desired_capacity: 2      
@@ -24,7 +24,7 @@
 #      launch_config_name: "{{ launch_template_name_was }}"   
     vpc_zone_identifier: ["{{ subnet_was1_result.subnet.id }}", "{{ subnet_was2_result.subnet.id }}"]    
     launch_template: 
-      version: '1'
+      version: '2'
       launch_template_name: "{{ template_name_was }}"
       launch_template_id: "{{ template_id_was }}"
     desired_capacity: 2
