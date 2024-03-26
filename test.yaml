@@ -38,9 +38,9 @@
     ansible.builtin.import_tasks:
       file: "./tasks/8_cloudwatch.yaml"   
 
-  - name: Include task list in play efs
-    ansible.builtin.import_tasks:
-      file: "./tasks/9_efs.yaml"                      
+#  - name: Include task list in play efs
+#    ansible.builtin.import_tasks:
+#      file: "./tasks/9_efs.yaml"                      
 
 - hosts: project_ec2_bastion
   tasks:
