@@ -85,7 +85,7 @@
   #     src: "{{ web_efs_result.file_system_id }}"
   #     fstype: nfs4
   #     state: mounted
-
+  tasks:
   - name: Copy a "blind_web" file into place for ansible
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_web/
@@ -115,7 +115,7 @@
   #     src: "{{ was_efs_result.file_system_id }}"
   #     fstype: nfs4
   #     state: mounted
-
+  tasks:
   - name: Copy a "blind_was" file into place for ansible
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_was/
