@@ -74,16 +74,16 @@
     mode: '0400'
 
 ############ download aws cli by curl ###########        
-- name: download aws cli by curl
-  ansible.builtin.command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
+# - name: download aws cli by curl
+#   ansible.builtin.command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 
 
 ############ unzip aws cli ###########      
-- name: unzip aws cli 
-  ansible.builtin.command: unzip awscliv2.zip 
+# - name: unzip aws cli 
+#   ansible.builtin.command: unzip awscliv2.zip 
 
 ############ install aws cli ###########      
-- name: install aws cli
-  ansible.builtin.command: ./aws/install
+# - name: install aws cli
+#   ansible.builtin.command: ./aws/install
 
 ############ create directory .aws for configure ###########      
 - name: Create a directory ".aws"
