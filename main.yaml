@@ -11,7 +11,7 @@
         name: "efs_name_web"
         targets:
           - subnet_id: "subnet-0d93739b4da99a8d5"
-            security_groups: [" sg-02396524debb6de38" ]
+            security_groups: [ "sg-02396524debb6de38" ]
           - subnet_id: "subnet-02be0fb335a7482fb"
             security_groups: [ "sg-02396524debb6de38" ]         
       resigter: web_efs_result
