@@ -6,14 +6,14 @@
  ############ copy blind_was files  ###########
 - name: Copy a "blind_was" file into place for ansible
   ansible.builtin.copy:
-    src: /home/nana/pro/files/blind_was/
+    src: /home/nana/project/files/blind_was/
     dest: /home/ec2-user/service/blind_was/
     mode: 755
 
 ############ copy blind_was.service ###########
 - name: Copy a "bilind_was.service" file into place for ansible
   ansible.builtin.copy:
-    src: /home/nana/pro/files/was.service
+    src: /home/nana/project/files/was.service
     dest: /etc/systemd/system/blind_was.service
     owner: root
     group: root
