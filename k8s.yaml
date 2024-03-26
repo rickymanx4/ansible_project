@@ -2,3 +2,16 @@ plugin: kubernetes.core.k8s
 connections:
   - namespaces:
     - test
+
+filters:
+  instance-state-name: running
+  tag:name:
+    - node1
+    - node2    
+
+keyed_groups:
+  - prefix: tags
+    key: tags
+
+  - key: tags.name
+    separator: ''    
