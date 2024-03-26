@@ -8,6 +8,10 @@
   tasks:
   - name: Include task list in play 1~9
     ansible.builtin.import_tasks:
+      file: "./tasks/1_vpc.yaml"
+    
+  - name: Include task list in play 1~9
+    ansible.builtin.import_tasks:
       file: "{{ item }}"
     loop:
       - ./tasks/1_vpc.yaml      
