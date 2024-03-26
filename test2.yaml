@@ -48,7 +48,7 @@
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
   - name: create a subnet group to RDS for web
-    amazon.aws.rds_subnet_group:
+    rds_subnet:
       state: "{{ state }}"
       description: RDS subnet for web
       vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
@@ -59,7 +59,7 @@
         name: "{{ subnet_name_db1 }}"
 
   - name: change a subnet group to RDS
-    amazon.aws.rds_subnet_group:
+    rds_subnet:
       state: "{{ state }}"
       description: RDS subnet for was
       vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
