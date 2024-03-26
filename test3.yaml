@@ -4,13 +4,7 @@
   connection: localhost
   vars_files:
     - ./vars.yaml  
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"     
+   
   tasks:
   - name: Include task list in play vpc
     ansible.builtin.import_tasks:
@@ -27,9 +21,17 @@
   - name: Include task list in play efs
     ansible.builtin.import_tasks:
       file: "./tasks/9_efs.yaml"
-   
-  - name: Mount up device web efs
-    hosts: web_asg
+
+- hosts: web_asg   
+  vars: 
+    ansible_ssh_common_args:
+      -o ProxyCommand="ssh
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i ~/.ssh/ec2-key.pem
+      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
+  tasks:    
+  - name: Mount up device web efs 
     ansible.posix.mount:
       path: /home/ec2-user/efs
       src: "{{ web_efs_mount_id }}:/"
@@ -37,8 +39,16 @@
       state: mounted
     
 # ############ mount efs file system in was ec2 ###########                  
+- hosts: was_asg   
+  vars: 
+    ansible_ssh_common_args:
+      -o ProxyCommand="ssh
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i ~/.ssh/ec2-key.pem
+      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
+  tasks:    
   - name: Mount up device was efs
-    hosts: was_asg  
     ansible.posix.mount:
       path: /home/ec2-user/efs
       src: "{{ was_efs_mount_id }}:/"
