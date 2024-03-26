@@ -47,7 +47,14 @@
   #     iam_roles:
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
-
+  - name: change a subnet group to RDS
+    amazon.aws.rds_subnet_group:
+      state: "{{ state }}"
+      name: rds_subnets
+      description: RDS subnet
+      subnets:
+        - "{{ subnet_db1_result.subnet.id }}"
+        - "{{ subnet_db2_result.subnet.id }}"
     
 
 # create RDS instance with mysql
@@ -61,7 +68,8 @@
       #   - role_arn: "{{ instance_role }}"          
       db_name: "{{ rds_name_01 }}"
       db_instance_class: "db.t2.small"
-      db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
+      db_security_groups: 
+        - "{{ security_group_db_result.group_id }}"
       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
       db_instance_identifier: "{{ rds_ec2_name_01 }}"      
       master_username: "aduser"

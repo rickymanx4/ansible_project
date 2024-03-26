@@ -1,0 +1,37 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: localhost
+  vars_files:
+    - ./vars.yaml  
+  tasks:
+  - name: Include task list in play vpc
+    ansible.builtin.import_tasks:
+      file: "./tasks/1_vpc.yaml"
+    
+  - name: Include task list in play subnet
+    ansible.builtin.import_tasks:
+      file: "./tasks/2_subnet.yaml"    
+
+  - name: Include task list in play security_group
+    ansible.builtin.import_tasks:
+      file: "./tasks/3_security_group.yaml" 
+
+  - name: Include task list in play efs
+    ansible.builtin.import_tasks:
+      file: "./tasks/9_efs.yaml"
+   
+  - name: Mount up device web efs
+    ansible.posix.mount:
+      path: /home/ec2-user/efs
+      src: "{{ web_efs_result.file_system_id }}:/"
+      fstype: nfs4
+      state: mounted
+    
+# ############ mount efs file system in was ec2 ###########                  
+  - name: Mount up device was efs
+    ansible.posix.mount:
+      path: /home/ec2-user/efs
+      src: "{{ was_efs_result.file_system_id }}:/"
+      fstype: nfs4
+      state: mounted   
