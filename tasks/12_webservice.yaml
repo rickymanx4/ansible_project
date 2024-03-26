@@ -28,10 +28,11 @@
     state: started
    
 ############ mount efs file system in web ec2 ###########                  
-- name: Mount up device web efs
-  hosts: web_asg
-  ansible.posix.mount:
-    path: /home/ec2-user/efs
-    src: "{{ web_efs_result.file_system_id }}"
-    fstype: nfs4
-    state: mounted       
+# - name: Mount up device web efs
+#   hosts: web_asg
+#   ansible.posix.mount:
+#     path: /home/ec2-user/efs
+#     src: "{{ web_efs_result.file_system_id }}"
+#     fstype: nfs4
+#     state: mounted       
+
