@@ -29,6 +29,7 @@
       file: "./tasks/9_efs.yaml"
    
   - name: Mount up device web efs
+    hosts: web_asg
     ansible.posix.mount:
       path: /home/ec2-user/efs
       src: "{{ web_efs_mount_id }}:/"
@@ -37,6 +38,7 @@
     
 # ############ mount efs file system in was ec2 ###########                  
   - name: Mount up device was efs
+    hosts: was_asg  
     ansible.posix.mount:
       path: /home/ec2-user/efs
       src: "{{ was_efs_mount_id }}:/"
