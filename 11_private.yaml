@@ -95,7 +95,7 @@
 
   - name: Copy a "bilind_web.service" file into place for ansible
     ansible.builtin.copy:
-      remote_src: /home/nana/pro/files/web.service
+      src: /home/nana/pro/files/web.service
       dest: /etc/systemd/system/blind_web.service
       owner: root
       group: root
@@ -127,7 +127,7 @@
   tasks:
   - name: Copy a "blind_was" file into place for ansible
     ansible.builtin.copy:
-      remote_src: /home/nana/pro/files/blind_was/
+      src: /home/nana/pro/files/blind_was/
       dest: /home/ec2-user/service/
       mode: 755
 
