@@ -34,7 +34,7 @@
   - name: Mount up device was efs
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: "{{ efs_name_was }}.mount_point"
+      src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
       fstype: nfs4
       state: mounted  
 
@@ -50,9 +50,10 @@
   - name: Mount up device web efs 
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: "{{ efs_name_web }}.mount_point"
+      src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
       fstype: nfs4
       state: mounted
     
 # ############ mount efs file system in was ec2 ###########                  
- 
+
+#"{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_was }}') }}"
