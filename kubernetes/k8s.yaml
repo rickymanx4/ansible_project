@@ -1,7 +1,5 @@
 plugin: kubernetes.core.k8s
 connections:
-  - host:
-    - 100.100.20.16
-    - 100.100.10.218  
+  - namespace: spring
 
     

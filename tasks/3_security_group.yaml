@@ -80,8 +80,8 @@
       group_name: "{{ security_group_name_web }}"
     - proto: tcp
       ports:
-      - 80
-      group_name: "{{ security_group_name_exlb }}"      
+      - 5000
+      group_name: "{{ security_group_name_web }}"      
       rule_desc: allow all on port 80        
   register: security_group_inlb_result            
 
