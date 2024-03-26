@@ -1,41 +1,41 @@
 ########### create a vpc with name, cidr block,dns support, and tenancy ###########
-  - name: create a new ec2 VPC    
-    amazon.aws.ec2_vpc_net:     
-      name: "{{ vpc_name }}" 
-      cidr_block: "{{ vpcCidrBlock }}"
-      region: "{{ region }}"
-      # enable dns support 
-      dns_support: yes
-      # enable dns hostnames
-      dns_hostnames: yes
-      state: "{{ state }}"
-    register: ec2_vpc_net_result
+- name: create a new ec2 VPC    
+  amazon.aws.ec2_vpc_net:     
+    name: "{{ vpc_name }}" 
+    cidr_block: "{{ vpcCidrBlock }}"
+    region: "{{ region }}"
+    # enable dns support 
+    dns_support: yes
+    # enable dns hostnames
+    dns_hostnames: yes
+    state: "{{ state }}"
+  register: ec2_vpc_net_result
 
 ############ create an internet gateway for the vpc ###########   
-  - name: create ec2 vpc internet gateway           
-    amazon.aws.ec2_vpc_igw:
-      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-      region: "{{ region }}"
-      state: "{{ state }}" 
-      tags:
-        Name: "{{ igw_name }}"
-    register: igw_result
-    
+- name: create ec2 vpc internet gateway           
+  amazon.aws.ec2_vpc_igw:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}" 
+    tags:
+      Name: "{{ igw_name }}"
+  register: igw_result
+  
 ############ create a elastic IP for nat gateway ###########
-  # - name: allocate a new elastic IP 
-  #   amazon.aws.ec2_eip:
-  #     state: "{{ state }}"
-  #     tags:
-  #       name:  "{{ eip_name }}"
-  #   register: eip_result
+# - name: allocate a new elastic IP 
+#   amazon.aws.ec2_eip:
+#     state: "{{ state }}"
+#     tags:
+#       name:  "{{ eip_name }}"
+#   register: eip_result
 
 ############ create a nat gateway for private routing table ###########
-  # - name: Create new nat gateway 
-  #   amazon.aws.ec2_vpc_nat_gateway:
-  #     state: "{{ state }}"
-  #     subnet_id: "{{ subnet_pub2_result.subnet.id }}"
-  #     eip_address: "{{ eip_result.public_ip }}"
-  #     region: "{{ region }}"
-  #     tags:
-  #       name:  "{{ nat_gateway_name }}"      
-  #   register: nat_gateway_result
+# - name: Create new nat gateway 
+#   amazon.aws.ec2_vpc_nat_gateway:
+#     state: "{{ state }}"
+#     subnet_id: "{{ subnet_pub2_result.subnet.id }}"
+#     eip_address: "{{ eip_result.public_ip }}"
+#     region: "{{ region }}"
+#     tags:
+#       name:  "{{ nat_gateway_name }}"      
+#   register: nat_gateway_result
