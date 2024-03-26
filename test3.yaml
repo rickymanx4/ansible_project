@@ -32,7 +32,7 @@
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
   tasks:    
   - name: Mount up device was efs
-    ansible.posix.mount:
+    mount:
       path: /home/ec2-user/efs
       src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
       fstype: nfs4
@@ -48,7 +48,7 @@
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
   tasks:    
   - name: Mount up device web efs 
-    ansible.posix.mount:
+    mount:
       path: /home/ec2-user/efs
       src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
       fstype: nfs4
