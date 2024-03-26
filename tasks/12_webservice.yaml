@@ -2,37 +2,37 @@
 ################  private ec2(web) ansible ###########################
 #########################################################################
 
-- hosts: web_asg
-  gather_facts: yes
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"   
-  tasks:  
 
 ############ copy blind_web files  ###########
-  - name: Copy a "blind_web" file into place for ansible
-    ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_web/
-      dest: /home/ec2-user/service/blind_web/
-      mode: 755
+- name: Copy a "blind_web" file into place for ansible
+  ansible.builtin.copy:
+    src: /home/nana/pro/files/blind_web/
+    dest: /home/ec2-user/service/blind_web/
+    mode: 755
 
 ############ copy blind_web.service ###########
-  - name: Copy a "bilind_web.service" file into place for ansible
-    ansible.builtin.copy:
-      src: /home/nana/pro/files/web.service
-      dest: /etc/systemd/system/blind_web.service
-      owner: root
-      group: root
-      mode: 755      
+- name: Copy a "bilind_web.service" file into place for ansible
+  ansible.builtin.copy:
+    src: /home/nana/pro/files/web.service
+    dest: /etc/systemd/system/blind_web.service
+    owner: root
+    group: root
+    mode: 755      
 
 ############ systemctl enable --now blind_web ###########
-  - name: Enable service blind_web.service and ensure 
-    ansible.builtin.systemd_service:
-      name: blind_web
-      enabled: true
-      daemon_reload: true
-      state: started
+- name: Enable service blind_web.service and ensure 
+  ansible.builtin.systemd_service:
+    name: blind_web
+    enabled: true
+    daemon_reload: true
+    state: started
+   
+
+############ mount efs file system in web ec2 ###########                  
+- name: Mount up device web efs
+  hosts: web_asg
+  ansible.posix.mount:
+    path: /home/ec2-user/efs
+    src: "{{ web_efs_result.file_system_id }}"
+    fstype: nfs4
+    state: mounted       
