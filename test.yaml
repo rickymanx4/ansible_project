@@ -90,4 +90,4 @@
   tasks:
   - name: Include task list in play wasserver service
     ansible.builtin.import_tasks:
-      file: ./tasks/13_wasbservice.yaml
+      file: ./tasks/13_wasservice.yaml
