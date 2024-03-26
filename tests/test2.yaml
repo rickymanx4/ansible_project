@@ -1,10 +1,45 @@
----
-- hosts: tags_Name_project_ec2_bastion
-  gather_facts: no
-  vars_files:
-    - ./vars.yaml
-  tasks:
-    - name: Check HTML content installed
-      ansible.builtin.copy:
-        src: ./bastion_userdata.sh
-        dest: "/home/ec-2user"
+  vars:
+    ansible_user: ec2-user
+    ansible_ssh_private_key_file: ~/.ssh/ec2-key.pem   
+        ansible_ssh_common_args: -o ProxyCommand="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -i ec2-key.pem -W %h:%p ec2-user@"{{ hostvars[groups['project_ec2_bastion'][0]['public_ip_address']] }}"
+    
+
+
+
+Host bastion
+   User ec2-user
+   Hostname ec2-57-180-21-191.ap-northeast-1.compute.amazonaws.com
+   IdentityFile ~/.ssh/ec2-key.pem
+   ForwardAgent yes
+   Port 22
+
+Host web1
+   ProxyCommand ssh bastion -W %h:%p
+   User ec2-user
+   IdentityFile ~/.ssh/ec2-key.pem
+   Hostname 100.100.10.39
+   Port 22
+Host web2
+   ProxyCommand ssh bastion -W %h:%p
+   User ec2-user
+   IdentityFile ~/.ssh/ec2-key.pem
+   Hostname 100.100.20.66
+   Port 22
+Host was1
+   ProxyCommand ssh bastion -W %h:%p
+   User ec2-user
+   IdentityFile ~/.ssh/ec2-key.pem
+   Hostname 100.100.110.161
+   Port 22
+Host was2
+   ProxyCommand ssh bastion -W %h:%p
+   User ec2-user
+   IdentityFile ~/.ssh/ec2-key.pem
+   Hostname 100.100.120.7
+   Port 22
+
+
+
+   
+
+   

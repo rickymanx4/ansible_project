@@ -1,0 +1,96 @@
+############ create the subnet for the vpc with a cidr block ###########   
+  - name: create ec2 vpc subnet_pub1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub1 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub1 }}"
+    register: subnet_pub1_result
+
+  - name: create ec2 vpc subnet_pub2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_pub2 }}"
+      map_public: yes
+      resource_tags:
+        Name: "{{ subnet_name_pub2 }}"
+    register: subnet_pub2_result        
+
+  - name: create ec2 vpc subnet_web1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web1 }}"
+    register: subnet_web1_result
+
+  - name: create ec2 vpc subnet_web2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_web2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_web2 }}"
+    register: subnet_web2_result    
+
+  - name: create ec2 vpc subnet_was1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was1 }}"
+    register: subnet_was1_result    
+
+  - name: create ec2 vpc subnet_was2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_was2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_was2 }}"
+    register: subnet_was2_result    
+
+  - name: create ec2 vpc subnet_db1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db1 }}"
+    register: subnet_db1_result    
+
+  - name: create ec2 vpc subnet_db2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db2 }}"
+    register: subnet_db2_result    
