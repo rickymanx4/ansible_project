@@ -79,7 +79,7 @@
 
 
 - hosts: was_asg
-  gather_facts: no
+  gather_facts: yes
   tasks:
  
   - name: Copy a "blind_was" file into place for ansible
@@ -102,13 +102,13 @@
       enabled: true
       daemon_reload: true
       state: started
-      
+
 #########################################################################
 ################  private ec2(web) ansible ###########################
 #########################################################################
 
 - hosts: web_asg
-  gather_facts: no
+  gather_facts: yes
   tasks:  
 
   - name: Copy a "blind_web" file into place for ansible
