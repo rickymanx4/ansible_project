@@ -95,11 +95,19 @@
 
   - name: Copy a "bilind_web.service" file into place for ansible
     ansible.builtin.copy:
-      remote_src: /home/nana/pro/files/blind_web.service
+      remote_src: /home/nana/pro/files/web.service
       dest: /etc/systemd/system/blind_web.service
       owner: root
       group: root
       mode: 755      
+
+  - name: Enable service blind_web.service and ensure 
+    ansible.builtin.systemd_service:
+      name: blind_web
+      enabled: true
+      daemon_reload: true
+      state: start
+      
 
 #########################################################################
 ################  private ec2(was) ansible ###########################
@@ -125,8 +133,15 @@
 
   - name: Copy a "bilind_was.service" file into place for ansible
     ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_was.service
+      src: /home/nana/pro/files/was.service
       dest: /etc/systemd/system/blind_was.service
       owner: root
       group: root
       mode: 755    
+
+  - name: Enable service blind_web.service and ensure 
+    ansible.builtin.systemd_service:
+      name: blind_was
+      enabled: true
+      daemon_reload: true
+      state: start      
