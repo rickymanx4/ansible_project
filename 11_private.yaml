@@ -92,7 +92,7 @@
   - name: Copy a "blind_web" file into place for ansible
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_web/
-      dest: /home/ec2-user/service/
+      dest: /home/ec2-user/service/blind_web/
       mode: 755
 
   - name: Copy a "bilind_web.service" file into place for ansible
@@ -130,7 +130,7 @@
   - name: Copy a "blind_was" file into place for ansible
     ansible.builtin.copy:
       src: /home/nana/pro/files/blind_was/
-      dest: /home/ec2-user/service/
+      dest: /home/ec2-user/service/blind_was/
       mode: 755
 
   - name: Copy a "bilind_was.service" file into place for ansible
