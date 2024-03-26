@@ -65,8 +65,8 @@
     ansible.builtin.pip:
       name:
         - flask
-        - gunicorn        
-        - requests
+        - gunicorn
+        - requests        
         - pymysql
         - flask-cors
       state: latest      
@@ -106,7 +106,7 @@
       name: blind_web
       enabled: true
       daemon_reload: true
-      state: start
+      state: started
       
 
 #########################################################################
@@ -144,4 +144,4 @@
       name: blind_was
       enabled: true
       daemon_reload: true
-      state: start      
+      state: started      
