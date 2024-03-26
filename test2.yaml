@@ -58,8 +58,8 @@
       apply_immediately: true
       options:
         - option_name: MEMCACHED
-          port: 3306
-          vpc_security_group_memberships: [ "{{ subnet_db1_result.subnet.name }}" ]
+        - port: 3306
+        - vpc_security_group_memberships: [ "{{ subnet_db1_result.subnet.name }}" ]
     register: new_rds_mysql_option_group        
 
 # create RDS instance with mysql
