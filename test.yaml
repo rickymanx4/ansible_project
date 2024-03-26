@@ -22,17 +22,17 @@
 
     - name: Create RDS instance
       amazon.aws.rds_instance:
-        command: create
+        command: "create"
         db_instance_identifier: "{{ rds_ec2_name_01 }}"
-        engine: mysql
+        engine: "mysql"
         engine_version: "8.0.35"
-        instance_class: db.t2.micro
+        instance_class: "db.t2.micro"
         allocated_storage: 20
         db_name: "{{ rds_name_01 }}"
-        master_username: my_username
-        master_user_password: my_password
+        master_username: "my_username"
+        master_user_password: "my_password"
         db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
         db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
         wait_for_completion: yes
         tags:
-          - Name:  "{{ rds_name_01 }}"
+          - name: "{{ rds_name_01 }}"
