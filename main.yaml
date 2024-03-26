@@ -11,9 +11,9 @@
         name: "efs_name_web"
         targets:
           - subnet_id: "subnet-0d93739b4da99a8d5"
-            security_groups: ["sg-02396524debb6de38"]
-          - subnet_id: "subnet-02be0fb335a7482fb"
-            security_groups: ["sg-02396524debb6de38"]         
+            security_groups: [" sg-02396524debb6de38" ]
+#          - subnet_id: "subnet-02be0fb335a7482fb"
+#            security_groups: [ "sg-02396524debb6de38" ]         
       resigter: web_efs_result
 
    ############ create efs for was ###########
@@ -22,9 +22,9 @@
         state: present
         name: efs_name_was 
         targets:
-          - subnet_id: " subnet-0173fef119bf747cb"
-            security_groups: ["sg-0f40fdb042c96e5dc"]
-          - subnet_id: " subnet-02f6f9e0d6880a49c"
-            security_groups: ["sg-0f40fdb042c96e5dc" ]           
+          - subnet_id: "subnet-0173fef119bf747cb"
+            security_groups: [ "sg-0f40fdb042c96e5dc" ]
+#          - subnet_id: "subnet-02f6f9e0d6880a49c"
+#            security_groups: [ "sg-0f40fdb042c96e5dc" ]           
       resigter: was_efs_result
 
