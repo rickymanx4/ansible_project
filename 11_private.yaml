@@ -89,7 +89,7 @@
 
   - name: Copy a "blind_web" file into place for ansible
     ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_web/*
+      src: /home/nana/pro/files/blind_web/
       dest: /home/ec2-user/service/
       owner: root
       group: root
@@ -122,7 +122,7 @@
 
   - name: Copy a "blind_was" file into place for ansible
     ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_was/*
+      src: /home/nana/pro/files/blind_was/
       dest: /home/ec2-user/service/
       owner: root
       group: root
