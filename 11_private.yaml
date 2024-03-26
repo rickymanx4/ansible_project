@@ -73,7 +73,36 @@
 ############ pip3 install requests ###########  
   - name: pip3 install requests
     ansible.builtin.shell: pip3 install requests
+#########################################################################
+################  private ec2(was) ansible ###########################
+#########################################################################      
 
+
+- hosts: was_asg
+  gather_facts: no
+  tasks:
+ 
+  - name: Copy a "blind_was" file into place for ansible
+    ansible.builtin.copy:
+      src: /home/nana/pro/files/blind_was/
+      dest: /home/ec2-user/service/blind_was/
+      mode: 755
+
+  - name: Copy a "bilind_was.service" file into place for ansible
+    ansible.builtin.copy:
+      src: /home/nana/pro/files/was.service
+      dest: /etc/systemd/system/blind_was.service
+      owner: root
+      group: root
+      mode: 755      
+
+  - name: Enable service blind_was.service and ensure 
+    ansible.builtin.systemd_service:
+      name: blind_was
+      enabled: true
+      daemon_reload: true
+      state: started
+      
 #########################################################################
 ################  private ec2(web) ansible ###########################
 #########################################################################
@@ -81,13 +110,6 @@
 - hosts: web_asg
   gather_facts: no
   tasks:  
-############ mount efs file system in web ec2 ###########                  
-  # - name: Mount up device by UUID
-  #   ansible.posix.mount:
-  #     path: /home/ec2-user/efs
-  #     src: "{{ web_efs_result.file_system_id }}"
-  #     fstype: nfs4
-  #     state: mounted
 
   - name: Copy a "blind_web" file into place for ansible
     ansible.builtin.copy:
@@ -111,39 +133,3 @@
       state: started
       
 
-#########################################################################
-################  private ec2(was) ansible ###########################
-#########################################################################      
-
-
-- hosts: was_asg
-  gather_facts: no
-  tasks:
-############ mount efs file system in was ec2 ###########                  
-  # - name: Mount up device by UUID  
-  #   ansible.posix.mount:
-  #     path: /home/ec2-user/efs
-  #     src: "{{ was_efs_result.file_system_id }}"
-  #     fstype: nfs4
-  #     state: mounted
-  
-  - name: Copy a "blind_was" file into place for ansible
-    ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_was/
-      dest: /home/ec2-user/service/blind_was/
-      mode: 755
-
-  - name: Copy a "bilind_was.service" file into place for ansible
-    ansible.builtin.copy:
-      src: /home/nana/pro/files/was.service
-      dest: /etc/systemd/system/blind_was.service
-      owner: root
-      group: root
-      mode: 755      
-
-  - name: Enable service blind_was.service and ensure 
-    ansible.builtin.systemd_service:
-      name: blind_was
-      enabled: true
-      daemon_reload: true
-      state: started

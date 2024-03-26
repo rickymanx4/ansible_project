@@ -25,3 +25,19 @@
       - subnet_id: "{{ subnet_was2_result.subnet.id }}"
         security_groups: ["{{ security_group_was_result.group_id }}"]   
   resigter: was_efs_result          
+
+############ mount efs file system in was ec2 ###########                  
+- name: Mount up device was efs
+  ansible.posix.mount:
+    path: /home/ec2-user/efs
+    src: "{{ was_efs_result.file_system_id }}"
+    fstype: nfs4
+    state: mounted  
+
+############ mount efs file system in web ec2 ###########                  
+- name: Mount up device web efs
+  ansible.posix.mount:
+    path: /home/ec2-user/efs
+    src: "{{ web_efs_result.file_system_id }}"
+    fstype: nfs4
+    state: mounted    
