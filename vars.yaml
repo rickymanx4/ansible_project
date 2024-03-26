@@ -71,3 +71,7 @@ eks_nodegroup_role: "arn:aws:iam::569934397842:role/EKSNode-001"
 eks_nodegroup_name_web: "{{ vpc_title }}-nodegroup-web"
 eks_nodegroup_name_was: "{{ vpc_title }}-nodegroup-was"
 eks_nodegroup_name_db: "{{ vpc_title }}-nodegroup-db"
+
+
+
+

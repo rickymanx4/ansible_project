@@ -23,6 +23,8 @@ security_group_web_result
 security_group_inlb_result
 security_group_was_result
 security_group_db_result
+security_group_efs_web_result
+security_group_efs_was_result
 
 "{{ security_group_was_result.group_id }}"
 
@@ -53,3 +55,7 @@ web1_metric_alarm_result
 web2_metric_alarm_result
 
 "{{ as_policy_result.results[1].arn }}" 
+
+web_efs_result
+
+was_efs_result
