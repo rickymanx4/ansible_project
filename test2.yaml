@@ -57,8 +57,8 @@
       engine_name: "mysql"
       major_engine_version: "8.0.35"
       iam_roles: 
-        - feature_name: "wasstorage"
-        - role_arn: "{{ instance_role }}"          
+        feature_name: "wasstorage"
+        role_arn: "{{ instance_role }}"          
       db_name: "{{ rds_name_01 }}"
       db_instance_class: "db.t2.small"
       db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
