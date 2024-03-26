@@ -61,7 +61,7 @@
       state: latest        
 
 ############ pip install flask, gunicorn, flask-core, requests, pymysql ########### 
-  - name: Install python-pip packages with flaks service
+  - name: Install python-pip packages with flask service
     ansible.builtin.pip:
       name:
         - flask
@@ -69,7 +69,7 @@
         - requests
         - pymysql
         - flask-cors
-      state: latest
+      state: latest      
 
 
 #########################################################################
@@ -95,7 +95,7 @@
 
   - name: Copy a "bilind_web.service" file into place for ansible
     ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_web.service
+      remote_src: /home/nana/pro/files/blind_web.service
       dest: /etc/systemd/system/blind_web.service
       owner: root
       group: root
@@ -119,7 +119,7 @@
   tasks:
   - name: Copy a "blind_was" file into place for ansible
     ansible.builtin.copy:
-      src: /home/nana/pro/files/blind_was/
+      remote_src: /home/nana/pro/files/blind_was/
       dest: /home/ec2-user/service/
       mode: 755
 
