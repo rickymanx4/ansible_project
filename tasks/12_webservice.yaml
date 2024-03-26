@@ -6,14 +6,14 @@
 ############ copy blind_web files  ###########
 - name: Copy a "blind_web" file into place for ansible
   ansible.builtin.copy:
-    src: /home/nana/pro/files/blind_web/
+    src: /home/nana/project/files/blind_web/
     dest: /home/ec2-user/service/blind_web/
     mode: 755
 
 ############ copy blind_web.service ###########
 - name: Copy a "bilind_web.service" file into place for ansible
   ansible.builtin.copy:
-    src: /home/nana/pro/files/web.service
+    src: /home/nana/project/files/web.service
     dest: /etc/systemd/system/blind_web.service
     owner: root
     group: root
@@ -28,11 +28,11 @@
     state: started
    
 ############ mount efs file system in web ec2 ###########                  
-# - name: Mount up device web efs
-#   hosts: web_asg
-#   ansible.posix.mount:
-#     path: /home/ec2-user/efs
-#     src: "{{ web_efs_result.file_system_id }}"
-#     fstype: nfs4
-#     state: mounted       
+- name: Mount up device web efs
+  hosts: web_asg
+  ansible.posix.mount:
+    path: /home/ec2-user/efs
+    src: "{{ web_efs_result.file_system_id }}"
+    fstype: nfs4
+    state: mounted       
 
