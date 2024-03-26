@@ -27,7 +27,6 @@
     daemon_reload: true
     state: started
    
-
 ############ mount efs file system in web ec2 ###########                  
 - name: Mount up device web efs
   hosts: web_asg
