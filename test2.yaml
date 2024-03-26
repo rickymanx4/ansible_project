@@ -55,6 +55,9 @@
       subnets:
         - "{{ subnet_db1_result.subnet.id }}"
         - "{{ subnet_db2_result.subnet.id }}"
+      tags:
+        tag1: "{{ subnet_name_db1 }}"
+        tag2: "{{ subnet_name_db1 }}"        
     
 
 # create RDS instance with mysql
