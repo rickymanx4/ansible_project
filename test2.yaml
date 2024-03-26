@@ -48,21 +48,14 @@
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
 
-  - name: Create an RDS Mysql option group
-    amazon.aws.rds_option_group:
-      state: "present"
-      option_group_name: "mysql-option-group"
-      engine_name: "mysql"
-      major_engine_version: "8.0.35"
-      option_group_description: "test mysql option group"
-      apply_immediately: true
-    register: new_rds_mysql_option_group        
+    
 
 # create RDS instance with mysql
   - name: Create a DB instance 
     amazon.aws.rds_instance:  
       state: "{{ state }}"
-      option_group_name: "mysql-option-group"
+      engine_name: "mysql"
+      major_engine_version: "8.0.35"
       iam_roles: 
         - feature_name: "wasstorage"
         - role_arn: "{{ instance_role }}"          
