@@ -50,7 +50,7 @@
   community.aws.elb_target_group:
     region: "{{ region }}"
     name: "{{ target_group_was }}"
-    protocol: TCP
+    protocol: HTTP
     port: 5000
     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
     state: "{{ state }}"
