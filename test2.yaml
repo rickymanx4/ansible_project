@@ -54,10 +54,10 @@
   - name: Create a DB instance 
     amazon.aws.rds_instance:  
       state: "{{ state }}"
-      engine_name: "mysql"
-      major_engine_version: "8.0.35"
+      engine: "mysql"
+      engine_version: "8.0.35"
       iam_roles: 
-        feature_name: "wasstorage"
+        feature_name: "webstorage"
         role_arn: "{{ instance_role }}"          
       db_name: "{{ rds_name_01 }}"
       db_instance_class: "db.t2.small"
