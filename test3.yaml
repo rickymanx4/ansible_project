@@ -4,6 +4,13 @@
   connection: localhost
   vars_files:
     - ./vars.yaml  
+  vars: 
+    ansible_ssh_common_args:
+      -o ProxyCommand="ssh
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i ~/.ssh/ec2-key.pem
+      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"     
   tasks:
   - name: Include task list in play vpc
     ansible.builtin.import_tasks:
