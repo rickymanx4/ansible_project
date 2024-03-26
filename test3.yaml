@@ -34,7 +34,7 @@
   - name: Mount up device web efs 
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: "{{ web_efs_mount_id }}:/"
+      src: "fs-0178375f0a38f40d0:/"
       fstype: nfs4
       state: mounted
     
@@ -51,6 +51,6 @@
   - name: Mount up device was efs
     ansible.posix.mount:
       path: /home/ec2-user/efs
-      src: "{{ was_efs_mount_id }}:/"
+      src: "fs-0d915e67d4436c3da:/"
       fstype: nfs4
       state: mounted   
