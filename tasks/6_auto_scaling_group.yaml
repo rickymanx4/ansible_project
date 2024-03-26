@@ -5,7 +5,6 @@
     name: "{{ autoscaling_name_web }}"      
 #      launch_config_name: "{{ launch_template_name_web }}"
     vpc_zone_identifier: ["{{ subnet_web1_result.subnet.id }}", "{{ subnet_web2_result.subnet.id }}"]
-    security_groups: [ "{{ security_group_web_result.group_id }}" ]           
     launch_template: 
       version: '1'        
       launch_template_name: "{{ template_name_web }}"
