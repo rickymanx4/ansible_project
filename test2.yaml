@@ -49,7 +49,6 @@
   #         feature_name: 's3Export'        
   - name: create a subnet group to RDS for web
     amazon.aws.rds_subnet_group:
-      state: "{{ state }}"
       name: rdswebsubnet
       description: RDS subnet for web
       vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
@@ -61,7 +60,6 @@
 
   - name: change a subnet group to RDS
     amazon.aws.rds_subnet_group:
-      state: "{{ state }}"
       name: rdswassubnet
       description: RDS subnet for was
       vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
