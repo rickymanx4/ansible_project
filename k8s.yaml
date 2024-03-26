@@ -5,13 +5,14 @@ connections:
 
 filters:
   instance-state-name: running
-  tag:name:
-    - node1
-    - node2    
+  node_group:
+    - node2
+  labels:
+    - eks.amazonaws.com/nodegroup: node2  
 
 keyed_groups:
-  - prefix: tags
-    key: tags
+  - prefix: eks.amazonaws.com/nodegroup
+    key: labels
 
   - key: tags.name
     separator: ''    
