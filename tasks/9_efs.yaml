@@ -8,7 +8,7 @@
         security_groups: [ "{{ security_group_efs_web_result.group_id }}" ]          
       - subnet_id: "{{ subnet_web2_result.subnet.id }}"
         security_groups: [ "{{ security_group_efs_web_result.group_id }}"  ]          
-  register: web_efs_result
+  register: efs1_result 
 
 ############ create efs for was ###########
 - name: create efs for was
@@ -20,4 +20,4 @@
         security_groups: [ "{{ security_group_efs_was_result.group_id }}" ]          
       - subnet_id: "{{ subnet_was2_result.subnet.id }}"
         security_groups: [ "{{ security_group_efs_was_result.group_id }}" ]          
-  register: was_efs_result  
+  register: efs2_result  
