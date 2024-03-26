@@ -18,33 +18,33 @@
     ansible.builtin.import_tasks:
       file: "./tasks/3_security_group.yaml" 
 
-  - name: Include task list in play security_group
+  - name: Include task list in play routing_tables
     ansible.builtin.import_tasks:
       file: "./tasks/4_routing_tables.yaml" 
 
-  - name: Include task list in play security_group
+  - name: Include task list in play ec2_bastion
     ansible.builtin.import_tasks:
       file: "./tasks/5_ec2.yaml"       
 
-  - name: Include task list in play security_group
+  - name: Include task list in play auto_scaling_group
     ansible.builtin.import_tasks:
       file: "./tasks/6_auto_scaling_group.yaml"   
 
-  - name: Include task list in play security_group
+  - name: Include task list in play load_balancer
     ansible.builtin.import_tasks:
       file: "./tasks/7_load_balancer.yaml"     
 
-  - name: Include task list in play security_group
+  - name: Include task list in play cloud watch
     ansible.builtin.import_tasks:
       file: "./tasks/8_cloudwatch.yaml"   
 
-  - name: Include task list in play security_group
+  - name: Include task list in play efs
     ansible.builtin.import_tasks:
       file: "./tasks/9_efs.yaml"                      
 
 - hosts: project_ec2_bastion
   tasks:
-  - name: Include task list in play 10
+  - name: Include task list in play bastion for ansible
     ansible.builtin.import_tasks:
       file: ./tasks/10_bastion.yaml 
 
@@ -60,7 +60,7 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
   tasks:
-  - name: Include task list in play 11
+  - name: Include task list in play private ec2 default setting
     ansible.builtin.import_tasks:
       file: ./tasks/11_private.yaml       
 
@@ -74,7 +74,7 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
   tasks:
-  - name: Include task list in play 12
+  - name: Include task list in play webserver service
     ansible.builtin.import_tasks:
       file: ./tasks/12_webservice.yaml     
 
@@ -88,6 +88,6 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
   tasks:
-  - name: Include task list in play 13
+  - name: Include task list in play wasserver service
     ansible.builtin.import_tasks:
       file: ./tasks/13_wasbservice.yaml
