@@ -2,58 +2,44 @@
 ################  private ec2(web, was) ansible ###########################
 #########################################################################
 
-
-- hosts: 
-  - web_asg
-  - was_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"   
-  tasks:
-
 ############ ec2-user join group whell ###########
-  - name: Add the user 'ec2-user' with a bash shell, appending the group 'wheel' 
-    ansible.builtin.user:
-      name: ec2-user
-      shell: /bin/bash
-      groups: wheel       
-      append: yes    
+- name: Add the user 'ec2-user' with a bash shell, appending the group 'wheel' 
+  ansible.builtin.user:
+    name: ec2-user
+    shell: /bin/bash
+    groups: wheel       
+    append: yes    
 
 ############ create direrctory ansible ###########  
-  - name: Create a directory "service"
-    ansible.builtin.file:
-      path: /home/ec2-user/service
-      state: directory
-      mode: '0755'
+- name: Create a directory "service"
+  ansible.builtin.file:
+    path: /home/ec2-user/service
+    state: directory
+    mode: '0755'
 
 ############ dnf update ###########  
-  - name: dnf update
-    ansible.builtin.shell: dnf update      
+- name: dnf update
+  ansible.builtin.shell: dnf update      
 
 ############ dnf install python, nfs, efs utils ###########  
-  - name: Install the latest version of ansible, pyhon3-pip
-    ansible.builtin.dnf:
-      name:          
-        - python3-pip
-        - amazon-efs-utils
-        - nfs-utils
-      state: latest        
+- name: Install the latest version of ansible, pyhon3-pip
+  ansible.builtin.dnf:
+    name:          
+      - python3-pip
+      - amazon-efs-utils
+      - nfs-utils
+    state: latest        
 
 ############ pip install flask, gunicorn, flask-core, requests, pymysql ########### 
-  - name: Install python-pip packages with flask service
-    ansible.builtin.pip:
-      name:
-        - flask
-        - gunicorn
-        - pymysql
-        - flask-cors
-      state: latest      
+- name: Install python-pip packages with flask service
+  ansible.builtin.pip:
+    name:
+      - flask
+      - gunicorn
+      - pymysql
+      - flask-cors
+    state: latest      
 
 ############ pip3 install requests ###########  
-  - name: pip3 install requests
-    ansible.builtin.shell: pip3 install requests
+- name: pip3 install requests
+  ansible.builtin.shell: pip3 install requests
