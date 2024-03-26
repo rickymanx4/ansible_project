@@ -57,6 +57,10 @@
       ports:
       - 80
       group_name: "{{ security_group_name_exlb }}"
+    - proto: tcp
+      ports:
+      - 5000
+      group_name: "{{ security_group_name_exlb }}"      
       rule_desc: allow all on port 80        
   register: security_group_web_result    
 
@@ -74,6 +78,10 @@
       ports:
       - 80
       group_name: "{{ security_group_name_web }}"
+    - proto: tcp
+      ports:
+      - 80
+      group_name: "{{ security_group_name_exlb }}"      
       rule_desc: allow all on port 80        
   register: security_group_inlb_result            
 
@@ -96,6 +104,10 @@
       ports:
       - 80
       group_name: "{{ security_group_name_inlb }}"
+    - proto: tcp
+      ports:
+      - 5000
+      group_name: "{{ security_group_name_inlb }}"      
       rule_desc: allow all on port 80        
   register: security_group_was_result
 
@@ -113,6 +125,14 @@
       ports:
       - 3306
       group_name: "{{ security_group_name_was }}"
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_web }}"      
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_bastion }}"      
       rule_desc: allow all on port 3306      
   register: security_group_db_result
 
