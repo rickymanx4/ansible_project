@@ -1,0 +1,121 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: localhost
+  vars_files:
+    - ./vars.yaml
+  tasks:
+  - name: 1. creat vpc, igw, nat, eip
+    ansible.builtin.import_tasks:
+      file: tasks/1_vpc.yaml
+
+  - name: 2. creat subnet
+    ansible.builtin.import_tasks:
+      file: tasks/2_subnet.yaml
+
+  - name: 3. creat security_group
+    ansible.builtin.import_tasks:
+      file: tasks/3_security_group.yaml 
+
+  - name: Create an EKS cluster 
+    community.aws.eks_cluster:
+      name: "{{ eks_cluster_name }}"
+      version: 1.29
+      role_arn: "{{ eks_cluster_role }}"
+      subnets:
+        - "{{ subnet_web1_result.subnet.id }}"
+        - "{{ subnet_web2_result.subnet.id }}"
+        - "{{ subnet_was1_result.subnet.id }}"
+        - "{{ subnet_was2_result.subnet.id }}"
+        - "{{ subnet_db1_result.subnet.id }}"
+        - "{{ subnet_db2_result.subnet.id }}"                
+      security_groups:
+        - "{{ security_group_bastion_result.group_id }}"        
+    register: eks_cluster_result
+
+
+  - name: create nodegroup for web
+    community.aws.eks_nodegroup:
+      name: "{{ eks_nodegroup_name_web }}"
+      state: "{{ state }}"
+      cluster_name:  "{{ eks_cluster_name }}"
+      node_role: "{{ eks_nodegroup_role }}"
+      subnets:
+        - "{{ subnet_web1_result.subnet.id }}"
+        - "{{ subnet_web2_result.subnet.id }}"
+      scaling_config:
+        min_size: 1
+        max_size: 3
+        desired_size: 2
+      disk_size: 20
+      instance_types: '{{ instancesize_bastion }}'
+      ami_type: 'AL2023_x86_64'
+      remote_access:
+        ec2_ssh_key: ec2-key
+      labels:
+        'name': 'web nodes'
+      taints:
+        - key: 'test'
+          value: 'test'
+          effect: 'NO_SCHEDULE'
+      capacity_type: 'ON_DEMAND'    
+
+  - name: create nodegroup for was
+    community.aws.eks_nodegroup:
+      name: "{{ eks_nodegroup_name_was }}"
+      state: "{{ state }}"
+      cluster_name:  "{{ eks_cluster_name }}"
+      node_role: "{{ eks_nodegroup_role }}"
+      subnets:
+        - "{{ subnet_was1_result.subnet.id }}"
+        - "{{ subnet_was2_result.subnet.id }}"
+      scaling_config:
+        min_size: 1
+        max_size: 3
+        desired_size: 2
+      disk_size: 20
+      remote_access:
+        ec2_ssh_key: ec2-key      
+#      launch_template:
+#        - id : 
+#          name: 
+#          version :
+      instance_types: '{{ instancesize_bastion }}'
+      ami_type: 'AL2023_x86_64'
+      labels:
+        'name': 'web nodes'
+      taints:
+        - key: 'test'
+          value: 'test'
+          effect: 'NO_SCHEDULE'
+      capacity_type: 'ON_DEMAND'    
+
+  - name: create nodegroup for db
+    community.aws.eks_nodegroup:
+      name: "{{ eks_nodegroup_name_was }}"
+      state: "{{ state }}"
+      cluster_name:  "{{ eks_cluster_name }}"
+      node_role: "{{ eks_nodegroup_role }}"
+      subnets:
+        - "{{ subnet_db1_result.subnet.id }}"
+        - "{{ subnet_db2_result.subnet.id }}"
+      scaling_config:
+        min_size: 1
+        max_size: 3
+        desired_size: 2
+      disk_size: 20
+      remote_access:
+        ec2_ssh_key: ec2-key      
+#      launch_template:
+#        - id : 
+#          name: 
+#          version :
+      instance_types: '{{ instancesize_bastion }}'
+      ami_type: 'AL2023_x86_64'
+      labels:
+        'name': 'web nodes'
+      taints:
+        - key: 'test'
+          value: 'test'
+          effect: 'NO_SCHEDULE'
+      capacity_type: 'ON_DEMAND'        

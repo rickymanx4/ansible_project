@@ -1,0 +1,15 @@
+---
+- name: Deploy Nginx App
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Apply Deployment
+      k8s:
+        definition: "{{ lookup('file', 'spring_deploy.yaml') }}"
+        state: present
+
+    - name: Apply Service
+      k8s:
+        definition: "{{ lookup('file', 'spring_service.yaml') }}"
+        state: present
