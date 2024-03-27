@@ -67,22 +67,22 @@
         rule_desc: allow all on port 3306      
     register: security_group_db_result
 
-  # - name: Create RDS instance
-  #   amazon.aws.rds_instance:
-  #     command: create
-  #     db_instance_identifier: "{{ rds_ec2_name_01 }}"
-  #     engine: mysql
-  #     engine_version: "8.0.35"
-  #     instance_class: db.t2.micro
-  #     allocated_storage: 20
-  #     db_name: "{{ rds_name_01 }}"
-  #     master_username: my_username
-  #     master_user_password: my_password
-  #     db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
-  #     db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
-  #     wait_for_completion: yes
-  #     tags:
-  #       - Name:  "{{ rds_name_01 }}"
+  - name: Create RDS instance
+    amazon.aws.rds_instance:
+      command: create
+      db_instance_identifier: "{{ rds_ec2_name_01 }}"
+      engine: mysql
+      engine_version: "8.0.35"
+      instance_class: db.m5.large
+      allocated_storage: 20
+      db_name: "{{ rds_name_01 }}"
+      master_username: my_username
+      master_user_password: my_password
+      db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
+      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
+      multi_az: true
+      tags:
+        - Name:  "{{ rds_name_01 }}"
 
   # - name: Create DB instance with added IAM role
   #   amazon.aws.rds_instance:
@@ -94,43 +94,41 @@
   #     password: passw0rd
   #     db_instance_class: db.t2.small
   #     allocated_storage: 20
-  #     iam_roles:
-  #       - role_arn: "{{ iam_role.arn }}"
-  #         feature_name: 's3Export'        
+        
 
-  - name: change a subnet group to RDS
-    amazon.aws.rds_subnet_group:
-      state: "{{ state }}"
-      name: rds_subnets
-      description: RDS subnet      
-      subnets: 
-        - "{{ subnet_db1_result.subnet.id }}"
-        - "{{ subnet_db2_result.subnet.id }}"      
+  # - name: change a subnet group to RDS
+  #   amazon.aws.rds_subnet_group:
+  #     state: "{{ state }}"
+  #     name: rds_subnets
+  #     description: RDS subnet      
+  #     subnets: 
+  #       - "{{ subnet_db1_result.subnet.id }}"
+  #       - "{{ subnet_db2_result.subnet.id }}"      
   
     
 
 # create RDS instance with mysql
-  - name: Create a DB instance 
-    amazon.aws.rds_instance:  
-      state: "{{ state }}"
-      engine: "mysql"
-      engine_version: "8.0.35"
-      iam_roles: 
-        - feature_name: "webstorage"
-        - role_arn: "{{ instance_role }}"          
-      db_name: "{{ rds_name_01 }}"
-      db_instance_class:  "{{ instanscesize_rds }}"
-      db_security_groups: 
-        - "{{ security_group_db_result.group_id }}"
-      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
-      db_instance_identifier: "{{ rds_ec2_name_01 }}"      
-      master_username: "aduser"
-      master_user_password: "pass1234@@"
-      multi_az: true
-      storage_type: "gp3"
-      allocated_storage: 20             
-      publicly_accessible: false
-    register: rds1_result     
+  # - name: Create a DB instance 
+  #   amazon.aws.rds_instance:  
+  #     state: "{{ state }}"
+  #     engine: "mysql"
+  #     engine_version: "8.0.35"
+  #     iam_roles: 
+  #       - feature_name: "webstorage"
+  #       - role_arn: "{{ instance_role }}"          
+  #     db_name: "{{ rds_name_01 }}"
+  #     db_instance_class:  "{{ instanscesize_rds }}"
+  #     db_security_groups: 
+  #       - "{{ security_group_db_result.group_id }}"
+  #     db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+  #     db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+  #     master_username: "aduser"
+  #     master_user_password: "pass1234@@"
+  #     multi_az: true
+  #     storage_type: "gp3"
+  #     allocated_storage: 20             
+  #     publicly_accessible: false
+  #   register: rds1_result     
 
   # - name: create RDS instance
   #   amazon.aws.rds_instance:
