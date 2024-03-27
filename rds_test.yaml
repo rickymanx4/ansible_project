@@ -96,7 +96,7 @@
   #     iam_roles:
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
-  
+
   # - name: change a subnet group to RDS
   #   amazon.aws.rds_subnet_group:
   #     state: "{{ state }}"
@@ -130,25 +130,34 @@
   #       name: "{{ subnet_name_db2 }}"   
     
 
-# create RDS instance with mysql
-  - name: Create a DB instance 
-    amazon.aws.rds_instance:  
-      state: "{{ state }}"
-      engine: "mysql"
-      engine_version: "8.0.35"
-      iam_roles: 
-        - feature_name: "webstorage"
-        - role_arn: "{{ instance_role }}"          
-      db_name: "{{ rds_name_01 }}"
-      db_instance_class: "db.t2.small"
-      db_security_groups: 
-        - "{{ security_group_db_result.group_id }}"
-      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
-      db_instance_identifier: "{{ rds_ec2_name_01 }}"      
-      master_username: "aduser"
-      master_user_password: "pass1234@@"
-      multi_az: true
-      storage_type: "gp3"
-      allocated_storage: 20             
-      publicly_accessible: false
-    register: rds1_result       
+# # create RDS instance with mysql
+#   - name: Create a DB instance 
+#     amazon.aws.rds_instance:  
+#       state: "{{ state }}"
+#       engine: "mysql"
+#       engine_version: "8.0.35"
+#       iam_roles: 
+#         - feature_name: "webstorage"
+#         - role_arn: "{{ instance_role }}"          
+#       db_name: "{{ rds_name_01 }}"
+#       db_instance_class: "db.t2.small"
+#       db_security_groups: 
+#         - "{{ security_group_db_result.group_id }}"
+#       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+#       db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+#       master_username: "aduser"
+#       master_user_password: "pass1234@@"
+#       multi_az: true
+#       storage_type: "gp3"
+#       allocated_storage: 20             
+#       publicly_accessible: false
+#     register: rds1_result     
+
+
+  - name: Add a new security group without purge
+    amazon.aws.rds_instance:
+      id: "{{ rds_ec2_name_01 }}" 
+      state: present
+      vpc_security_group_ids:
+        - sg-0fd0f95d07641a5f7
+    register: result      
