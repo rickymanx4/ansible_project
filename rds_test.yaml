@@ -5,17 +5,66 @@
   vars_files:
     - ./vars.yaml  
   tasks:
-  - name: Include task list in play vpc
-    ansible.builtin.import_tasks:
-      file: "./tasks/1_vpc.yaml"
+  - name: create a new ec2 VPC    
+    amazon.aws.ec2_vpc_net:     
+      name: "{{ vpc_name }}" 
+      cidr_block: "{{ vpcCidrBlock }}"
+      region: "{{ region }}"
+      # enable dns support 
+      dns_support: yes
+      # enable dns hostnames
+      dns_hostnames: yes
+      state: "{{ state }}"
+    register: ec2_vpc_net_result
     
-  - name: Include task list in play subnet
-    ansible.builtin.import_tasks:
-      file: "./tasks/2_subnet.yaml"    
+  - name: create ec2 vpc subnet_db1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db1 }}"
+    register: subnet_db1_result    
 
-  - name: Include task list in play security_group
-    ansible.builtin.import_tasks:
-      file: "./tasks/3_security_group.yaml" 
+  - name: create ec2 vpc subnet_db2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db2 }}"
+    register: subnet_db2_result    
+
+- name: create ec2-db security group
+  amazon.aws.ec2_group:
+    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ security_group_name_db }}"
+    description: "{{ security_group_name_db }}"
+    tags:
+      Name: "{{ security_group_name_db  }}"
+    rules:
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_was }}"
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_web }}"      
+    - proto: tcp
+      ports:
+      - 3306
+      group_name: "{{ security_group_name_bastion }}"      
+      rule_desc: allow all on port 3306      
+  register: security_group_db_result
 
   # - name: Create RDS instance
   #   amazon.aws.rds_instance:
