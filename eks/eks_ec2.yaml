@@ -11,10 +11,11 @@
       assign_public_ip: true    
     image_id: "{{ images }}"
     count: 3 
-    tags:
-      - name: "{{ master_ec2_name }}"
-      - name: "{{ slave_web_ec2_name }}"
-      - name: "{{ slave_was_ec2_name }}"
+    tags: "{{ item.name }}"
+  loop:  
+    - name: "{{ master_ec2_name }}"
+    - name: "{{ slave_web_ec2_name }}"
+    - name: "{{ slave_was_ec2_name }}"
   register: ec2 
 
 
