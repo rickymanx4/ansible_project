@@ -103,8 +103,8 @@
       name: rds_subnets
       description: RDS subnet      
       subnets: 
-        - subnet-07b047881efde3792
-        - subnet-043aa505ff1f4518e
+        - subnet-15789498979879841
+        - subnet-043aa51231234518e
 
   # - name: create a subnet group to RDS for web
   #   amazon.aws.rds_subnet_group:
