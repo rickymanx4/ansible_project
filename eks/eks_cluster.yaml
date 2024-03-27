@@ -5,7 +5,7 @@
     instance_type: "{{ instancesize_bastion }}"
     image: "{{ images }}"
     wait: true
-    group: "{{ sercurity_group_name_bastion }}"
+    group: "{{ security_group_name_bastion }}"
     count: 1
     vpc_subnet_id: "{{ subnet_name_bastion }}"
     assign_public_ip: yes
