@@ -100,6 +100,7 @@
     amazon.aws.rds_subnet_group:
       state: "{{ state }}"
       name: rds_subnets
+      description: RDS subnet      
       region: "{{ region }}"
       subnets:
         - "{{ subnet_db1_result.subnet.id }}"
