@@ -1,5 +1,5 @@
 ---
-- name: Launching master EC2 instances on AWS
+- name: Launching master EC2 instances on AWS for k8s
   amazon.aws.ec2_instance:
     name: " k8s ec2 master for ansible "
     key_name: "{{ keys }}"
@@ -14,7 +14,7 @@
       name: "{{ master_ec2_name }}"
   register: ec2_master
 
-- name: Launching master EC2 instances on AWS
+- name: Launching web EC2 instances on AWS for k8s
   amazon.aws.ec2_instance:
     name: "{{ slave_web_ec2_name }}"
     key_name: "{{ keys }}"
@@ -29,7 +29,7 @@
       name: "{{ slave_web_ec2_name }}"
   register: ec2_web_slave 
 
-- name: Launching master EC2 instances on AWS
+- name: Launching was EC2 instances on AWS for k8s
   amazon.aws.ec2_instance:
     name: "{{ slave_was_ec2_name }}" 
     key_name: "{{ keys }}"
@@ -46,16 +46,16 @@
 
 - name: Add master instance to host group ec2_master
   ansible.builtin.add_host:
-    name: "{{ ec2.results[0].instances[0].public_ip }}"
+    name: "{{ ec2_master.instances[0].public_ip_address }}"
     groups: [ ec2_master ]
 
 - name: Add web_1 instance to host group ec2_web_slave
   ansible.builtin.add_host:
-    name: "{{ ec2.results[1].instances[0].public_ip }}"
+    name: "{{ ec2.results[1].instances[0].public_ip_address }}"
     groups: [ ec2_web_slave ]
 
 - name: Add web_2 instance to host group ec2_web_slave
   ansible.builtin.add_host:
-    name: "{{ ec2.results[2].instances[0].public_ip }}"
+    name: "{{ ec2.results[2].instances[0].public_ip_address }}"
     groups: [ ec2_web_slave ]
 
