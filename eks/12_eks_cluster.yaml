@@ -35,7 +35,7 @@
     community.aws.eks_nodegroup:
       name: "{{ eks_nodegroup_name_web }}"
       state: "{{ state }}"
-      cluster_name:  "{{ eks_cluster_name }}"
+      cluster_name:  "{{ eks_cluster_result.name }}"
       node_role: "{{ eks_nodegroup_role }}"
       subnets:
         - "{{ subnet_web1_result.subnet.id }}"
@@ -59,7 +59,7 @@
     community.aws.eks_nodegroup:
       name: "{{ eks_nodegroup_name_was }}"
       state: "{{ state }}"
-      cluster_name:  "{{ eks_cluster_name }}"
+      cluster_name:  "{{ eks_cluster_result.name }}"
       node_role: "{{ eks_nodegroup_role }}"
       subnets:
         - "{{ subnet_was1_result.subnet.id }}"
