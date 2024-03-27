@@ -167,3 +167,6 @@
       vpc_security_group_ids:
         - sg-0fd0f95d07641a5f7
     register: result      
+
+
+    서브넷을 확인하자
