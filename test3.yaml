@@ -32,11 +32,11 @@
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
   tasks:    
 ############ create direrctory ansible ###########  
-- name: Create a directory "service"
-  ansible.builtin.file:
-    path: /home/ec2-user/service
-    state: directory
-    mode: '0755'
+  - name: Create a directory "service"
+    ansible.builtin.file:
+      path: /home/ec2-user/service
+      state: directory
+      mode: '0755'
 
   - name: Create a directory "blind_was"
     ansible.builtin.file:
