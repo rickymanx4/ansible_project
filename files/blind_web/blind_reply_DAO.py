@@ -2,6 +2,7 @@ from flask import *
 import pymysql
 from blindlogging import *
 
+# rds 엔드포인트 주소와 생성한 master id/passwd 입력
 # DB 연결
 def db_connect() :
     db = pymysql.connect(

@@ -10,7 +10,7 @@ proxies = {
     'http': 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
 }
 
-
+# requests의 주소를 interanl loadbalancer로 변경
 # 글쓰기
 @bp.route("/write/proxy", methods=['POST', 'GET'])
 def write() :
