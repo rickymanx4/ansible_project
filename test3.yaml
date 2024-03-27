@@ -34,24 +34,24 @@
     files: -/.vars.yaml  
   tasks:    
 ############ create direrctory ansible ###########  
-  - name: Create a directory "service"
-    ansible.builtin.file:
-      path: /home/ec2-user/service
-      state: directory
-      mode: '0755'
+#   - name: Create a directory "service"
+#     ansible.builtin.file:
+#       path: /home/ec2-user/service
+#       state: directory
+#       mode: '0755'
 
-  - name: Create a directory "blind_web"
-    ansible.builtin.file:
-      path: /home/ec2-user/service/blind_web
-      state: directory
-      mode: '0755'
+#   - name: Create a directory "blind_web"
+#     ansible.builtin.file:
+#       path: /home/ec2-user/service/blind_web
+#       state: directory
+#       mode: '0755'
 
-############ copy blind_web files  ###########
-  - name: Copy a "blind_web" file into place for ansible
-    ansible.builtin.copy:
-      src: /home/nana/project/files/blind_web/
-      dest: /home/ec2-user/service/blind_web/
-      mode: 755
+# ############ copy blind_web files  ###########
+#   - name: Copy a "blind_web" file into place for ansible
+#     ansible.builtin.copy:
+#       src: /home/nana/project/files/blind_web/
+#       dest: /home/ec2-user/service/blind_web/
+#       mode: 755
 
   - name: Replace a webservice in loadbalancer
     ansible.builtin.replace:
