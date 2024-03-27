@@ -67,33 +67,34 @@
         rule_desc: allow all on port 3306      
     register: security_group_db_result
 
-  # - name: Create RDS instance
-  #   amazon.aws.rds_instance:
-  #     command: create
-  #     db_instance_identifier: "{{ rds_ec2_name_01 }}"
-  #     engine: mysql
-  #     engine_version: "8.0.35"
-  #     instance_class: db.m5.large
-  #     allocated_storage: 20
-  #     db_name: "{{ rds_name_01 }}"
-  #     master_username: my_username
-  #     master_user_password: my_password
-  #     db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
-  #     db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
-  #     multi_az: true
-  #     tags:
-  #       - Name:  "{{ rds_name_01 }}"
-
-  - name: Create DB instance with added IAM role
+  - name: Create RDS instance
     amazon.aws.rds_instance:
-      id: "my-instance-id"
-      state: present
+      command: create
+      db_instance_identifier: "{{ rds_ec2_name_01 }}"
       engine: mysql
       engine_version: "8.0.35"
-      username: my_user
-      password: passw0rd
-      db_instance_class: db.t2.small
+      instance_class: db.m5.large
       allocated_storage: 20
+      db_name: "{{ rds_name_01 }}"
+      master_username: my_username
+      master_user_password: my_password
+      db_security_groups:  [ "{{ security_group_db_result.group_id }}" ]
+      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
+      multi_az: true
+      tags:
+        name:  "{{ rds_name_01 }}"
+
+  # - name: Create DB instance with added IAM role
+  #   amazon.aws.rds_instance:
+  #     id: "my-instance-id"
+  #     state: present
+  #     engine: mysql
+  #     engine_version: "8.0.35"
+  #     username: my_user
+  #     password: passw0rd
+  #     db_instance_class: db.t2.small
+  #     allocated_storage: 20
+  #     db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
         
 
   # - name: change a subnet group to RDS
