@@ -96,15 +96,16 @@
   #     iam_roles:
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
-  - name: change a subnet group to RDS
-    amazon.aws.rds_subnet_group:
-      state: "{{ state }}"
-      name: rds_subnets
-      description: RDS subnet      
-      region: "{{ region }}"
-      subnets:
-        - "{{ subnet_db1_result.subnet.id }}"
-        - "{{ subnet_db2_result.subnet.id }}"
+  
+  # - name: change a subnet group to RDS
+  #   amazon.aws.rds_subnet_group:
+  #     state: "{{ state }}"
+  #     name: rds_subnets
+  #     description: RDS subnet      
+  #     region: "{{ region }}"
+  #     subnets:
+  #       - "{{ subnet_db1_result.subnet.id }}"
+  #       - "{{ subnet_db2_result.subnet.id }}"
 
   # - name: create a subnet group to RDS for web
   #   amazon.aws.rds_subnet_group:
