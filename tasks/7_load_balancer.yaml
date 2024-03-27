@@ -85,4 +85,5 @@
         Port: 5000
         DefaultActions: 
           - Type: "forward"
-            TargetGroupName: "{{ tg_was_result.target_group_name }}"           
+            TargetGroupName: "{{ tg_was_result.target_group_name }}"   
+  register: inlb_result                    

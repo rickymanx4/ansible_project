@@ -2,4 +2,4 @@ plugin: kubernetes.core.k8s
 connections:
   - namespace: default
 
-    
+# pod를 찾음

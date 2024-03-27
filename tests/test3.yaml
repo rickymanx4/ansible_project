@@ -57,3 +57,4 @@
 # ############ mount efs file system in was ec2 ###########                  
 
 #"{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_was }}') }}"
+
