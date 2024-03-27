@@ -69,11 +69,10 @@
 
   - name: Create RDS instance
     amazon.aws.rds_instance:
-      command: create
       db_instance_identifier: "{{ rds_ec2_name_01 }}"
       engine: mysql
       engine_version: "8.0.35"
-      instance_class: db.m5.large
+      db_instance_class: db.m5.large
       allocated_storage: 20
       db_name: "{{ rds_name_01 }}"
       master_username: my_username
