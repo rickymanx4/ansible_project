@@ -14,6 +14,7 @@ filters:
     - eks2_web
     - eks3_was
     - eks4_web
+    - project-master-ec2
 
 
 
