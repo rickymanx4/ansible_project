@@ -1,24 +1,24 @@
 - name: Add master instance to host group ec2_master
-  add_host:
-    hostname: "{{ master_result.results[0].instances[0].public_ip }}"
-    groupname: ec2_master
+  ansible.builtin.add_host:
+    name: "{{ master_result.results[0].instances[0].public_ip }}"
+    groups: [ ec2_master ]
 
 - name: Add web_1 instance to host group ec2_web_slave
-  add_host:
-    hostname: "{{ web_slave_result.results[0].instances[0].public_ip }}"
-    groupname: ec2_web_slave
+  ansible.builtin.add_host:
+    name: "{{ web_slave_result.results[0].instances[0].public_ip }}"
+    groups: [ ec2_web_slave ]
 
 - name: Add web_2 instance to host group ec2_web_slave
-  add_host:
-    hostname: "{{ web_slave_result.results[1].instances[0].public_ip }}"
-    groupname: ec2_web_slave
+  ansible.builtin.add_host:
+    name: "{{ web_slave_result.results[1].instances[0].public_ip }}"
+    groups: [ ec2_web_slave ]
 
 - name: Add was_1 instance to host group ec2_was_slave
-  add_host:
-    hostname: "{{ was_slave_result.results[0].instances[0].public_ip }}"
-    groupname: ec2_was_slave
+  ansible.builtin.add_host:
+    name: "{{ was_slave_result.results[0].instances[0].public_ip }}"
+    groups: [ ec2_was_slave ]
 
 - name: Add was_1 instance to host group ec2_was_lave
-  add_host:
-    hostname: "{{ was_slave_result.results[1].instances[0].public_ip }}"
-    groupname: ec2_was_slave
+  ansible.builtin.add_host:
+    name: "{{ was_slave_result.results[1].instances[0].public_ip }}"
+    groups: [ ec2_was_slave ]
