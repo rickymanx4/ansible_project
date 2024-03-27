@@ -78,7 +78,7 @@
       # master_username: my_username
       # master_user_password: my_password
       #vpc_security_group_ids: "{{ security_group_db_result.group_id }}" 
-      #db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
+      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}"       
       # multi_az: true
       # tags:
       #   name:  "{{ rds_name_01 }}"
