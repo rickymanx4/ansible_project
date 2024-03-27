@@ -137,51 +137,47 @@
   #       name: "{{ subnet_name_db2 }}"   
     
 
-# create RDS instance with mysql
-  - name: Create a DB instance 
-    amazon.aws.rds_instance:  
-      state: "{{ state }}"
-      engine: "mysql"
-      engine_version: "8.0.35"
-      iam_roles: 
-        - feature_name: "webstorage"
-        - role_arn: "{{ instance_role }}"          
-      db_name: "{{ rds_name_01 }}"
-      db_instance_class: "db.t2.small"
-      db_security_groups: 
-        - "{{ security_group_db_result.group_id }}"
+# # create RDS instance with mysql
+#   - name: Create a DB instance 
+#     amazon.aws.rds_instance:  
+#       state: "{{ state }}"
+#       engine: "mysql"
+#       engine_version: "8.0.35"
+#       iam_roles: 
+#         - feature_name: "webstorage"
+#         - role_arn: "{{ instance_role }}"          
+#       db_name: "{{ rds_name_01 }}"
+#       db_instance_class: "db.t2.small"
+#       db_security_groups: 
+#         - "{{ security_group_db_result.group_id }}"
+#       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+#       db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+#       master_username: "aduser"
+#       master_user_password: "pass1234@@"
+#       multi_az: true
+#       storage_type: "gp3"
+#       allocated_storage: 20             
+#       publicly_accessible: false
+#     register: rds1_result     
+
+  - name: create RDS instance
+    amazon.aws.rds_instance:
+      allocated_storage: 50
+      availability_zone: "{{ zone1 }}"
+      db_instance_class: "{{ insatancesize_rds }}"
+      db_instance_identifier: "my-test-rds"
+      db_name: "blinddb"
       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
-      db_instance_identifier: "{{ rds_ec2_name_01 }}"      
-      master_username: "aduser"
-      master_user_password: "pass1234@@"
-      multi_az: true
-      storage_type: "gp3"
-      allocated_storage: 20             
-      publicly_accessible: false
-    register: rds1_result     
-  # - name: create RDS instance
-  #   rds_instance:
-  #     allocated_storage: 50
-  #     availability_zone: "myaz"
-  #     aws_access_key: "aws_access_key_id"
-  #     aws_secret_key: "aws_secret_access_key"
-  #     db_instance_class: "db.m5.xlarge"
-  #     db_instance_identifier: "my-test-rds"
-  #     db_name: "tdb"
-  #     db_parameter_group_name: "my-oracle-param"
-  #     db_subnet_group_name: "my-subnet"
-  #     engine: "oracle-ee"
-  #     engine_version: "12.1.0.2.v19"
-  #     license_model: "bring-your-own-license"
-  #     master_user_password: "secret"
-  #     master_username: "dbmaster"
-  #     max_allocated_storage: 100
-  #     option_group_name: "my-oracle-og"
-  #     port: "1521"
-  #     region: "us-west-1"
-  #     state: "present"
-  #     storage_type: "gp2"
-  #     vpc_security_group_ids: "sg-123456"
+      engine: "mysql"
+      engine_version: "8.0.35"      
+      master_user_password: "secret"
+      master_username: "dbmaster"
+      max_allocated_storage: 20      
+      port: "3306"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      storage_type: "gp2"
+      vpc_security_group_ids: "{{ security_group_db_result.group_id }}"
 
 
 

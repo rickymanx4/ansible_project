@@ -37,7 +37,7 @@ region: 'ap-northeast-1'
 keys: 'ec2-key'
 instancesize_bastion: 't2.micro'
 instancesize_private: 't2.small'
-instanscesize_rds: 't2.medium'
+instanscesize_rds: 'db.m5.large'
 images: 'ami-031134f7a79b6e424'
 instance_role: 'arn:aws:iam::569934397842:instance-profile/full-role-man'
 autoscaling_name_web: "{{ vpc_title }}_AS_web"
