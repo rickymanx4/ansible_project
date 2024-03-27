@@ -41,30 +41,30 @@
         Name: "{{ subnet_name_db2 }}"
     register: subnet_db2_result    
 
-- name: create ec2-db security group
-  amazon.aws.ec2_group:
-    vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-    region: "{{ region }}"
-    state: "{{ state }}"
-    name: "{{ security_group_name_db }}"
-    description: "{{ security_group_name_db }}"
-    tags:
-      Name: "{{ security_group_name_db  }}"
-    rules:
-    - proto: tcp
-      ports:
-      - 3306
-      group_name: "{{ security_group_name_was }}"
-    - proto: tcp
-      ports:
-      - 3306
-      group_name: "{{ security_group_name_web }}"      
-    - proto: tcp
-      ports:
-      - 3306
-      group_name: "{{ security_group_name_bastion }}"      
-      rule_desc: allow all on port 3306      
-  register: security_group_db_result
+  - name: create ec2-db security group
+    amazon.aws.ec2_group:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      state: "{{ state }}"
+      name: "{{ security_group_name_db }}"
+      description: "{{ security_group_name_db }}"
+      tags:
+        Name: "{{ security_group_name_db  }}"
+      rules:
+      - proto: tcp
+        ports:
+        - 3306
+        group_name: "{{ security_group_name_was }}"
+      - proto: tcp
+        ports:
+        - 3306
+        group_name: "{{ security_group_name_web }}"      
+      - proto: tcp
+        ports:
+        - 3306
+        group_name: "{{ security_group_name_bastion }}"      
+        rule_desc: allow all on port 3306      
+    register: security_group_db_result
 
   # - name: Create RDS instance
   #   amazon.aws.rds_instance:
