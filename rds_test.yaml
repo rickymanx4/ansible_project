@@ -16,34 +16,31 @@
       dns_hostnames: yes
       state: "{{ state }}"
     register: ec2_vpc_net_result
+   
     
-  - name: Include task list in play subnet
-    ansible.builtin.import_tasks:
-      file: "./tasks/2_subnet.yaml"    
-    
-  # - name: create ec2 vpc subnet_db1
-  #   amazon.aws.ec2_vpc_subnet:
-  #     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-  #     region: "{{ region }}"
-  #     az: "{{ zone1 }}"      
-  #     state: "{{ state }}"
-  #     cidr: "{{ subNetCidrBlock_db1 }}"
-  #     map_public: no
-  #     resource_tags:
-  #       Name: "{{ subnet_name_db1 }}"
-  #   register: subnet_db1_result    
+  - name: create ec2 vpc subnet_db1
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone1 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db1 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db1 }}"
+    register: subnet_db1_result    
 
-  # - name: create ec2 vpc subnet_db2
-  #   amazon.aws.ec2_vpc_subnet:
-  #     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-  #     region: "{{ region }}"
-  #     az: "{{ zone2 }}"      
-  #     state: "{{ state }}"
-  #     cidr: "{{ subNetCidrBlock_db2 }}"
-  #     map_public: no
-  #     resource_tags:
-  #       Name: "{{ subnet_name_db2 }}"
-  #   register: subnet_db2_result    
+  - name: create ec2 vpc subnet_db2
+    amazon.aws.ec2_vpc_subnet:
+      vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
+      region: "{{ region }}"
+      az: "{{ zone2 }}"      
+      state: "{{ state }}"
+      cidr: "{{ subNetCidrBlock_db2 }}"
+      map_public: no
+      resource_tags:
+        Name: "{{ subnet_name_db2 }}"
+    register: subnet_db2_result    
 
   - name: create ec2-db security group
     amazon.aws.ec2_group:
@@ -101,83 +98,57 @@
   #       - role_arn: "{{ iam_role.arn }}"
   #         feature_name: 's3Export'        
 
-  # - name: change a subnet group to RDS
-  #   amazon.aws.rds_subnet_group:
-  #     state: "{{ state }}"
-  #     name: rds_subnets
-  #     description: RDS subnet      
-  #     subnets: 
-  #       - "{{ subnet_web1_result.subnet.id }}"
-  #       - "{{ subnet_web2_result.subnet.id }}"      
-  #       - "{{ subnet_was1_result.subnet.id }}"
-  #       - "{{ subnet_was2_result.subnet.id }}"      
-
-
-
-  # - name: create a subnet group to RDS for web
-  #   amazon.aws.rds_subnet_group:
-  #     name: rdswebsubnet
-  #     description: RDS subnet for web
-  #     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-  #     subnet_name: "{{ subnet_name_db1 }}"
-  #     cidr_block: "{{ subNetCidrBlock_db1 }}"
-  #     availability_zone: "{{ zone1 }}"      
-  #     tags:
-  #       name: "{{ subnet_name_db1 }}"
-
-  # - name: change a subnet group to RDS
-  #   amazon.aws.rds_subnet_group:
-  #     name: rdswassubnet
-  #     description: RDS subnet for was
-  #     vpc_id: "{{ ec2_vpc_net_result.vpc.id }}"
-  #     subnet_name: "{{ subnet_name_db2 }}"
-  #     cidr_block: "{{ subNetCidrBlock_db2 }}"
-  #     availability_zone: "{{ zone2 }}"      
-  #     tags:
-  #       name: "{{ subnet_name_db2 }}"   
+  - name: change a subnet group to RDS
+    amazon.aws.rds_subnet_group:
+      state: "{{ state }}"
+      name: rds_subnets
+      description: RDS subnet      
+      subnets: 
+        - "{{ subnet_db1_result.subnet.id }}"
+        - "{{ subnet_db2_result.subnet.id }}"      
+  
     
 
-# # create RDS instance with mysql
-#   - name: Create a DB instance 
-#     amazon.aws.rds_instance:  
-#       state: "{{ state }}"
-#       engine: "mysql"
-#       engine_version: "8.0.35"
-#       iam_roles: 
-#         - feature_name: "webstorage"
-#         - role_arn: "{{ instance_role }}"          
-#       db_name: "{{ rds_name_01 }}"
-#       db_instance_class: "db.t2.small"
-#       db_security_groups: 
-#         - "{{ security_group_db_result.group_id }}"
-#       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
-#       db_instance_identifier: "{{ rds_ec2_name_01 }}"      
-#       master_username: "aduser"
-#       master_user_password: "pass1234@@"
-#       multi_az: true
-#       storage_type: "gp3"
-#       allocated_storage: 20             
-#       publicly_accessible: false
-#     register: rds1_result     
-
-  - name: create RDS instance
-    amazon.aws.rds_instance:
-      allocated_storage: 50
-      availability_zone: "{{ zone1 }}"
-      db_instance_class: "{{ instanscesize_rds }}"
-      db_instance_identifier: "my-test-rds"
-      db_name: "blinddb"
-      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
-      engine: "mysql"
-      engine_version: "8.0.35"      
-      master_user_password: "secret"
-      master_username: "dbmaster"
-      max_allocated_storage: 20      
-      port: 3306
-      region: "{{ region }}"
+# create RDS instance with mysql
+  - name: Create a DB instance 
+    amazon.aws.rds_instance:  
       state: "{{ state }}"
-      storage_type: "gp2"
-      vpc_security_group_ids: "{{ security_group_db_result.group_id }}"
+      engine: "mysql"
+      engine_version: "8.0.35"
+      iam_roles: 
+        - feature_name: "webstorage"
+        - role_arn: "{{ instance_role }}"          
+      db_name: "{{ rds_name_01 }}"
+      db_instance_class:  "{{ instanscesize_rds }}"
+      db_security_groups: 
+        - "{{ security_group_db_result.group_id }}"
+      db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+      db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+      master_username: "aduser"
+      master_user_password: "pass1234@@"
+      multi_az: true
+      storage_type: "gp3"
+      allocated_storage: 20             
+      publicly_accessible: false
+    register: rds1_result     
+
+  # - name: create RDS instance
+  #   amazon.aws.rds_instance:
+  #     allocated_storage: 50
+  #     availability_zone: "{{ zone1 }}"
+  #     db_instance_class: "{{ instanscesize_rds }}"
+  #     db_instance_identifier: "my-test-rds"
+  #     db_name: "blinddb"
+  #     db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
+  #     engine: "mysql"
+  #     engine_version: "8.0.35"      
+  #     master_user_password: "secret"
+  #     master_username: "dbmaster"   
+  #     port: 3306
+  #     region: "{{ region }}"
+  #     state: "{{ state }}"
+  #     storage_type: "gp2"
+  #     vpc_security_group_ids: "{{ security_group_db_result.group_id }}"
 
 
 
