@@ -19,7 +19,7 @@ filters:
 keyed_groups:
   #  - prefix: tags
   #    key: tags
-  - key: tags.Name
+  - key: tags.name
     separator: ''
 hostnames:
   - network-interface.association.public-ip
