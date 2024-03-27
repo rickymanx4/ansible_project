@@ -1,6 +1,6 @@
 - name: Add master instance to host group ec2_master
   ansible.builtin.add_host:
-    name: "{{ master_result.instances.public_ip_address }}"
+    name: "{{ master_result.instances[0].public_ip_address }}"
     groups: [ ec2_master ]
 
 - name: Add web_1 instance to host group ec2_web_slave
