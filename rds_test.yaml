@@ -164,7 +164,7 @@
     amazon.aws.rds_instance:
       allocated_storage: 50
       availability_zone: "{{ zone1 }}"
-      db_instance_class: "{{ insatancesize_rds }}"
+      db_instance_class: "{{ instanscesize_rds }}"
       db_instance_identifier: "my-test-rds"
       db_name: "blinddb"
       db_subnet_group_name: "{{ subnet_db1_result.subnet.name }}" 
