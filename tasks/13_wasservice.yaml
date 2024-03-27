@@ -3,7 +3,7 @@
 #########################################################################      
 
 
-- name: Create a directory "service"
+- name: Create a directory "blind_was"
   ansible.builtin.file:
     path: /home/ec2-user/service/blind_was
     state: directory
@@ -43,20 +43,13 @@
 
 # src 부분에서 efs 생성의 return값을 반환하지 못하여 직접 입력      
 
-- name: Replace a webservice in loadbalancer
-  ansible.builtin.lineinfile:
-    path: /home/ec2-user/service/board.py
-    regexp: '{{ inlb_result.dns_name }}:5000'
-    line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
-
-- name: Replace a webservice service in rds mount point
-  ansible.builtin.lineinfile:
-    path: /home/ec2-user/service/{{ item }}
-    regexp: '{{ rds_result.endpoint.address }}'
-    line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
+- name: Replace a wasservice service in rds mount point
+  ansible.builtin.replace:
+    path: /home/ec2-user/service/blind_was/{{ item }}    
+    regexp: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
+    replace: 'projectrdsec2.cqvnunqao1xr.ap-northeast-1.rds.amazonaws.com' 
   loop:
     - blind_board_DAO.py  
     - blind_member_DAO.py
     - blind_reply_DAO.py
-
-# lineinfile 사용하여 로드벨런서,rds 입력  
+# 변수 적용이 안되서 rds endpoint를 직접 입력 
