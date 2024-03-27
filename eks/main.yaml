@@ -25,18 +25,21 @@
 
 - hosts: ec2_master
   gather_facts: no
+  tasks:
   - name: Running K8s Master task
     ansible.builtin.import_tasks:
       file: ./master.yaml
 
 - hosts: ec2_web_slave
   gather_facts: no
+  tasks:  
   - name: Running K8s web_slave Role
     ansible.builtin.import_tasks:
       file: ./slave.yaml
 
 - hosts: ec2_was_slave
   gather_facts: no
+  tasks:  
   - name: Running K8s was_slave Role
     ansible.builtin.import_tasks:
       file: ./slave.yaml        
