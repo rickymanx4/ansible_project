@@ -1,6 +1,6 @@
 ---
 - name: Launching master EC2 instances on AWS
-  ec2:
+  amazon.aws.ec2_instance:
     key_name: "{{ keys }}"
     instance_type: "{{ instancesize_bastion }}"
     image: "{{ images }}"
