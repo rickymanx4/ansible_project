@@ -48,7 +48,7 @@
         id: "{{ eks_web_template }}"
         version: 1
       labels:
-        name: 'web nodes'
+        name: 'web_nodes'
       taints:
         - key: 'test'
           value: 'test'
@@ -72,7 +72,7 @@
         id: "{{ eks_was_template }}"
         version: 1
       labels:
-        name: 'was nodes'
+        name: 'was_nodes'
       taints:
         - key: 'test'
           value: 'test'
