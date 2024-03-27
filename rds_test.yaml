@@ -105,6 +105,9 @@
       subnets: 
         - "{{ subnet_db1_result.subnet.id }}"
         - "{{ subnet_db2_result.subnet.id }}"
+      tags:
+        tag1: "{{ rds_name_01 }}"
+        tag2: "{{ rds_name_02 }}"
 
   # - name: create a subnet group to RDS for web
   #   amazon.aws.rds_subnet_group:
