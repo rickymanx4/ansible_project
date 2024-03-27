@@ -46,7 +46,7 @@
         desired_size: 2
       launch_template:
         id: "{{ eks_web_template }}"
-        version: 1
+        version: 2
       labels:
         name: 'web_nodes'
       taints:
@@ -70,7 +70,7 @@
         desired_size: 2
       launch_template:
         id: "{{ eks_was_template }}"
-        version: 1
+        version: 2
       labels:
         name: 'was_nodes'
       taints:
