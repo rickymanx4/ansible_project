@@ -1,19 +1,18 @@
 ---
 - name: Launching master EC2 instances on AWS
   amazon.aws.ec2_instance:
+    name: "{{ master_ec2_name }}"
     key_name: "{{ keys }}"
     instance_type: "{{ instancesize_bastion }}"
+    security_group: "{{ security_group_bastion_result.group_id }}"    
+    vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+    instance_role: "{{ instance_role }}"
+    network:
+      assign_public_ip: true    
     image_id: "{{ images }}"
-    wait: true
-    group: "{{ security_group_name_bastion }}"
-    count: 1
-    vpc_subnet_id: "{{ subnet_name_pub1 }}"
-    assign_public_ip: yes
-    region: "{{ region }}"
-    state: present
-    instance_tags:
-      name: master
-  register: master_result
+    tags:
+      name: "{{ master_ec2_name }}"
+  register: master_result 
 
 - name: Create an EKS cluster 
   community.aws.eks_cluster:

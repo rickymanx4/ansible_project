@@ -78,4 +78,4 @@ security_group_name_efs_was: "{{ vpc_title }}-efs-was-sg"
 eks_web_template: "lt-0b675e139ea0c58dd"
 eks_was_template: "lt-038007300bbe9fdc0"
 eks_default_sg: "sg-073eba15df42ae099"
-
+master_ec2_name: "{{ vpc_title }}-master-ec2"
