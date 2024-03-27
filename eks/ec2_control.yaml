@@ -5,7 +5,7 @@
 
 - name: Add web_1 instance to host group ec2_web_slave
   ansible.builtin.add_host:
-    name: "{{ web_slave_result.instances[0].public_ip_address }}"
+    name: "{{ web_slave_result.results[0].instances[0].public_ip_address }}"
     groups: [ ec2_web_slave ]
 
 - name: Add web_2 instance to host group ec2_web_slave
