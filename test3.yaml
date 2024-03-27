@@ -22,52 +22,6 @@
               TargetGroupName: "project-tg-was"   
     register: inlb_result 
 
-# - hosts: was_asg   
-#   vars: 
-#     ansible_ssh_common_args:
-#       -o ProxyCommand="ssh
-#       -o StrictHostKeyChecking=no
-#       -o UserKnownHostsFile=/dev/null
-#       -i ~/.ssh/ec2-key.pem
-#       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
-#   tasks:    
-# ############ create direrctory ansible ###########  
-#   - name: Create a directory "service"
-#     ansible.builtin.file:
-#       path: /home/ec2-user/service
-#       state: directory
-#       mode: '0755'
-
-#   - name: Create a directory "blind_was"
-#     ansible.builtin.file:
-#       path: /home/ec2-user/service/blind_was
-#       state: directory
-#       mode: '0755'
-
-#   ############ copy blind_was files  ###########
-#   - name: Copy a "blind_was" file into place for ansible
-#     ansible.builtin.copy:
-#       src: /home/nana/project/files/blind_was/
-#       dest: /home/ec2-user/service/blind_was/
-#       mode: 755
-
-#   - name: Replace a webservice in loadbalancer
-#     ansible.builtin.lineinfile:
-#       path: /home/ec2-user/service/blind_was/board.py
-#       regexp: 'internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com:5000'
-# #      regexp: '{{ inlb_result.dns_name }}:5000'
-#       line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
-
-  # - name: Replace a webservice service in rds mount point
-  #   ansible.builtin.lineinfile:
-  #     path: /home/ec2-user/service/{{ item }}
-  #     regexp: '{{ rds_result.endpoint.address }}'
-  #     line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
-  #   loop:
-  #     - blind_board_DAO.py  
-  #     - blind_member_DAO.py
-  #     - blind_reply_DAO.py
-
 
 - hosts: web_asg   
   vars: 
@@ -102,8 +56,8 @@
     ansible.builtin.replace:
       path: /home/ec2-user/service/blind_web/board.py
       regexp: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com'
-      replace: 'http://internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com'        
-      #regexp: '{{ inlb_result.dns_name }}:5000'
+      #replace: 'http://internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com'        
+      replace: '{{ inlb_result.dns_name }}:5000'
       
 
     # - name: Replace a webservice service in rds mount point
@@ -117,3 +71,48 @@
     #     - blind_reply_DAO.py
 
 
+# - hosts: was_asg   
+#   vars: 
+#     ansible_ssh_common_args:
+#       -o ProxyCommand="ssh
+#       -o StrictHostKeyChecking=no
+#       -o UserKnownHostsFile=/dev/null
+#       -i ~/.ssh/ec2-key.pem
+#       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
+#   tasks:    
+# ############ create direrctory ansible ###########  
+#   - name: Create a directory "service"
+#     ansible.builtin.file:
+#       path: /home/ec2-user/service
+#       state: directory
+#       mode: '0755'
+
+#   - name: Create a directory "blind_was"
+#     ansible.builtin.file:
+#       path: /home/ec2-user/service/blind_was
+#       state: directory
+#       mode: '0755'
+
+#   ############ copy blind_was files  ###########
+#   - name: Copy a "blind_was" file into place for ansible
+#     ansible.builtin.copy:
+#       src: /home/nana/project/files/blind_was/
+#       dest: /home/ec2-user/service/blind_was/
+#       mode: 755
+
+#   - name: Replace a webservice in loadbalancer
+#     ansible.builtin.lineinfile:
+#       path: /home/ec2-user/service/blind_was/board.py
+#       regexp: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
+#       replace: 'internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com'
+#       regexp: '{{ inlb_result.dns_name }}:5000'
+
+  # - name: Replace a webservice service in rds mount point
+  #   ansible.builtin.lineinfile:
+  #     path: /home/ec2-user/service/{{ item }}
+  #     regexp: '{{ rds_result.endpoint.address }}'
+  #     line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
+  #   loop:
+  #     - blind_board_DAO.py  
+  #     - blind_member_DAO.py
+  #     - blind_reply_DAO.py
