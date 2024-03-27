@@ -1,0 +1,78 @@
+---
+- name: Launching master EC2 instances on AWS
+  ec2:
+    key_name: "{{ keys }}"
+    instance_type: "{{ instancesize_bastion }}"
+    image: "{{ images }}"
+    wait: true
+    group: "{{ sercurity_group_name_bastion }}"
+    count: 1
+    vpc_subnet_id: "{{ subnet_name_bastion }}"
+    assign_public_ip: yes
+    region: "{{ region }}"
+    state: present
+    instance_tags:
+      name: master
+  register: master_result
+
+- name: Create an EKS cluster 
+  community.aws.eks_cluster:
+    name: "{{ eks_cluster_name }}"
+    version: 1.29
+    role_arn: "{{ eks_cluster_role }}"
+    security_groups: "{{ eks_default_sg }}"
+    subnets:
+      - "{{ subnet_pub1_result.subnet.id }}"
+      - "{{ subnet_pub2_result.subnet.id }}"
+  register: eks_cluster_result
+
+
+- name: create nodegroup for web
+  community.aws.eks_nodegroup:
+    name: "{{ eks_nodegroup_name_web }}"
+    state: "{{ state }}"
+    cluster_name:  "{{ eks_cluster_result.name }}"
+    node_role: "{{ eks_nodegroup_role }}"
+    subnets:
+      - "{{ subnet_pub1_result.subnet.id }}"
+      - "{{ subnet_pub2_result.subnet.id }}"
+    scaling_config:
+      min_size: 1
+      max_size: 3
+      desired_size: 2
+    launch_template:
+      id: "{{ eks_web_template }}"
+      version: 3
+    labels:
+      name: 'web_nodes'
+    taints:
+      - key: 'test'
+        value: 'test'
+        effect: 'NO_SCHEDULE'
+    capacity_type: 'ON_DEMAND'    
+  register: web_slave_result    
+
+- name: create nodegroup for web
+  community.aws.eks_nodegroup:
+    name: "{{ eks_nodegroup_name_was }}"
+    state: "{{ state }}"
+    cluster_name:  "{{ eks_cluster_result.name }}"
+    node_role: "{{ eks_nodegroup_role }}"
+    subnets:
+      - "{{ subnet_pub1_result.subnet.id }}"
+      - "{{ subnet_pub2_result.subnet.id }}"
+    scaling_config:
+      min_size: 1
+      max_size: 3
+      desired_size: 2
+    launch_template:
+      id: "{{ eks_was_template }}"
+      version: 3
+    labels:
+      name: 'was_nodes'
+    taints:
+      - key: 'test'
+        value: 'test'
+        effect: 'NO_SCHEDULE'
+    capacity_type: 'ON_DEMAND'
+  register: was_slave_result 
