@@ -173,7 +173,7 @@
       master_user_password: "secret"
       master_username: "dbmaster"
       max_allocated_storage: 20      
-      port: "3306"
+      port: 3306
       region: "{{ region }}"
       state: "{{ state }}"
       storage_type: "gp2"
