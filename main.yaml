@@ -40,13 +40,17 @@
 
   - name: Include task list in play efs
     ansible.builtin.import_tasks:
-      file: "./tasks/9_efs.yaml"                      
+      file: "./tasks/9_efs.yaml"       
+
+  - name: Include task list in play efs
+    ansible.builtin.import_tasks:
+      file: "./tasks/10_rds.yaml"                     
 
 - hosts: project_ec2_bastion
   tasks:
   - name: Include task list in play bastion for ansible
     ansible.builtin.import_tasks:
-      file: ./tasks/10_bastion.yaml 
+      file: ./tasks/11_bastion.yaml 
 
 - hosts: 
   - web_asg
@@ -62,7 +66,7 @@
   tasks:
   - name: Include task list in play private ec2 default setting
     ansible.builtin.import_tasks:
-      file: ./tasks/11_private.yaml       
+      file: ./tasks/12_private.yaml       
 
 - hosts: web_asg
   gather_facts: no
@@ -76,7 +80,7 @@
   tasks:
   - name: Include task list in play webserver service
     ansible.builtin.import_tasks:
-      file: ./tasks/12_webservice.yaml     
+      file: ./tasks/13_webservice.yaml     
 
 - hosts: was_asg
   gather_facts: no
@@ -90,4 +94,4 @@
   tasks:
   - name: Include task list in play wasserver service
     ansible.builtin.import_tasks:
-      file: ./tasks/13_wasservice.yaml
+      file: ./tasks/14_wasservice.yaml

@@ -43,12 +43,14 @@
     regexp: '{{ inlb_result.dns_name }}:5000'
     line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
 
-- name: Replace a webservice in loadbalancer
+- name: Replace a webservice service in rds mount point
   ansible.builtin.lineinfile:
     path: /home/ec2-user/service/{{ item }}
-    regexp: '{{ rds1_result.endpoint.address }}'
+    regexp: '{{ rds_result.endpoint.address }}'
     line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
   loop:
     - blind_board_DAO.py  
     - blind_member_DAO.py
     - blind_reply_DAO.py
+
+# lineinfile 사용하여 로드벨런서,rds 입력  
