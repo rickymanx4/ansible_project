@@ -31,7 +31,14 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
   tasks:    
-  - name: Create a directory "service"
+############ create direrctory ansible ###########  
+- name: Create a directory "service"
+  ansible.builtin.file:
+    path: /home/ec2-user/service
+    state: directory
+    mode: '0755'
+
+  - name: Create a directory "blind_was"
     ansible.builtin.file:
       path: /home/ec2-user/service/blind_was
       state: directory
@@ -44,12 +51,12 @@
       dest: /home/ec2-user/service/blind_was/
       mode: 755
 
-  - name: Replace a webservice in loadbalancer
-    ansible.builtin.lineinfile:
-      path: /home/ec2-user/service/blind_was/board.py
-      regexp: 'internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com:5000'
-#      regexp: '{{ inlb_result.dns_name }}:5000'
-      line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
+#   - name: Replace a webservice in loadbalancer
+#     ansible.builtin.lineinfile:
+#       path: /home/ec2-user/service/blind_was/board.py
+#       regexp: 'internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com:5000'
+# #      regexp: '{{ inlb_result.dns_name }}:5000'
+#       line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
 
   # - name: Replace a webservice service in rds mount point
   #   ansible.builtin.lineinfile:
@@ -71,7 +78,14 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
   tasks:    
+############ create direrctory ansible ###########  
   - name: Create a directory "service"
+    ansible.builtin.file:
+      path: /home/ec2-user/service
+      state: directory
+      mode: '0755'
+
+  - name: Create a directory "blind_web"
     ansible.builtin.file:
     path: /home/ec2-user/service/blind_web
     state: directory
