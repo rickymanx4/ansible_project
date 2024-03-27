@@ -158,7 +158,8 @@
     amazon.aws.rds_instance:
       id: "{{ rds_ec2_name_01 }}" 
       db_instance_class: "db.t2.small"      
-      db_instance_identifier: "{{ rds_ec2_name_01 }}"      
+      db_instance_identifier: "{{ rds_ec2_name_01 }}"
+      db_subnet_group_name: subnet-0b2f7004b38846241      
       state: present
       engine: "mysql"      
       vpc_security_group_ids:
