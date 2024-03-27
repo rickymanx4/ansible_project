@@ -1,7 +1,7 @@
 ---
 # tasks file for kube_slave
 - name: Add kubeadm repositories on Slave Node
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: kube
     description: Kubernetes repo
     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
@@ -10,7 +10,7 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 - name: Installing Docker & kubeadm on Slave Node
-  package:
+  ansible.builtin.package:
     name:
       - docker
       - kubeadm
@@ -18,7 +18,7 @@
     state: present
 
 - name: Staring & enabling Docker & kubelet on Slave Node
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     state: started
     enabled: yes
@@ -27,7 +27,7 @@
     - kubelet
 
 - name: Updating Docker cgroup on Slave Node
-  copy:
+  ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: |
       {
@@ -35,22 +35,22 @@
       }
 
 - name: Restart Docker on Slave Node
-  service:
+  ansible.builtin.service:
     name: docker
     state: restarted
 
 - name: Updating IP tables on Slave Node
-  copy:
+  ansible.builtin.copy:
     dest: /etc/sysctl.d/k8s.conf
     content: |
       net.bridge.bridge-nf-call-ip6tables = 1
       net.bridge.bridge-nf-call-iptables = 1
 
 - name: Reloading sysctl on Slave Node
-  command: sysctl --system
+  ansible.builtin.command: sysctl --system
 
 - name: Joining the master node
-  command: "{{ hostvars[groups['ec2_master'][0]]['token']['stdout'] }}"
+  ansible.builtin.command: "{{ hostvars[groups['ec2_master'][0]]['token']['stdout'] }}"
 
 - name: Cleaning Caches on RAM
-  shell: echo 3 > /proc/sys/vm/drop_caches
+  ansible.builtin.shell: echo 3 > /proc/sys/vm/drop_caches
