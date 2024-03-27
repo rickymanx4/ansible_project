@@ -103,8 +103,8 @@
       name: rds_subnets
       description: RDS subnet      
       subnets: 
-        - subnet-15789498979879841
-        - subnet-043aa51231234518e
+        - "{{ subnet_db1_result.subnet.id }}"
+        - "{{ subnet_db2_result.subnet.id }}"
 
   # - name: create a subnet group to RDS for web
   #   amazon.aws.rds_subnet_group:
@@ -158,7 +158,7 @@
       id: "{{ rds_ec2_name_01 }}" 
       db_instance_class: "db.t2.small"      
       db_instance_identifier: "{{ rds_ec2_name_01 }}"
-      db_subnet_group_name: subnet-07b047881efde3792
+      db_subnet_group_name: subnet-07b047881efde3792      
       state: present
       engine: "mysql"      
       vpc_security_group_ids:
