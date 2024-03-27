@@ -9,11 +9,9 @@ cache: false
 
 filters:
   instance-state-name: running
-  tag:Name:
-    - eks1_was
-    - eks2_web
-    - eks3_was
-    - eks4_web
+  tag:name:
+    - web_node
+    - was_node
     - project-master-ec2
 
 
