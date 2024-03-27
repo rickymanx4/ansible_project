@@ -73,15 +73,15 @@
       engine: "mysql"
       engine_version: "8.0.35"
       db_instance_class: "db.m5.large"
-      # allocated_storage: 20
-      # db_name: "{{ rds_name_01 }}"
-      # master_username: my_username
-      # master_user_password: my_password
-      #vpc_security_group_ids: "{{ security_group_db_result.group_id }}" 
+      allocated_storage: 20
+      db_name: "{{ rds_name_01 }}"
+      master_username: my_username
+      master_user_password: my_password
+      vpc_security_group_ids: "{{ security_group_db_result.group_id }}" 
       db_subnet_group_name: "rds_subnets"       
-      # multi_az: true
-      # tags:
-      #   name:  "{{ rds_name_01 }}"
+      multi_az: true
+      tags:
+        name:  "{{ rds_name_01 }}"
 
   # - name: Create DB instance with added IAM role
   #   amazon.aws.rds_instance:
