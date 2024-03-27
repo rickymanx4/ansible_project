@@ -101,9 +101,10 @@
   - name: Replace a webservice in loadbalancer
     ansible.builtin.replace:
       path: /home/ec2-user/service/blind_web/board.py
-      regexp: 'internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com:5000'        
+      regexp: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com'
+      replace: 'http://internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com'        
       #regexp: '{{ inlb_result.dns_name }}:5000'
-      line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com'
+      
 
     # - name: Replace a webservice service in rds mount point
     #   ansible.builtin.lineinfile:
