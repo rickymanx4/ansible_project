@@ -9,7 +9,7 @@ cache: false
 
 filters:
   instance-state-name: running
-  tags:Name:
+  tag:Name:
     - eks1_was
     - eks2_web
     - eks3_was
