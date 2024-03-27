@@ -75,6 +75,7 @@ was_efs_mount_id: "fs-0d915e67d4436c3da"
 web_efs_mount_id: "fs-0178375f0a38f40d0"
 security_group_name_efs_web: "{{ vpc_title }}-efs-web-sg"
 security_group_name_efs_was: "{{ vpc_title }}-efs-was-sg"
+inlb_dns_name: "{{ inlb_result.dns_name }}"
 
 
 
