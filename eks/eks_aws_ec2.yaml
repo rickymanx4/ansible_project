@@ -9,7 +9,7 @@ cache: false
 
 filters:
   instance-state-name: running
-  tag:eks:nodegroup-name:
+  tag:nodegroup-name:
     - project-nodegroup-web
     - project-nodegroup-was
 
@@ -17,7 +17,7 @@ filters:
 keyed_groups:
   #  - prefix: tags
   #    key: tags
-  - key: tags.eks:nodegroup-name
+  - key: tags.nodegroup-name
     separator: ''
 hostnames:
   - network-interface.association.public-ip
