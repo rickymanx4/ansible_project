@@ -7,15 +7,15 @@
   tasks:
   - name: 1. creat vpc, igw, nat, eip
     ansible.builtin.import_tasks:
-      file: tasks/1_vpc.yaml
+      file: ../tasks/1_vpc.yaml
 
   - name: 2. creat subnet
     ansible.builtin.import_tasks:
-      file: tasks/2_subnet.yaml
+      file: ../tasks/2_subnet.yaml
 
   - name: 3. creat security_group
     ansible.builtin.import_tasks:
-      file: tasks/3_security_group.yaml 
+      file: ../tasks/3_security_group.yaml 
 
   - name: Create an EKS cluster 
     community.aws.eks_cluster:
