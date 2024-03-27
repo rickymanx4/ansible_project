@@ -32,14 +32,14 @@
     ansible.builtin.import_tasks:
       file: ./master.yaml
 
-- hosts: web_node
+- hosts: project-slave-web-ec2
   gather_facts: no
   tasks:  
   - name: Running K8s web_slave Role
     ansible.builtin.import_tasks:
       file: ./slave.yaml
 
-- hosts: was_node
+- hosts: project-slave-was-ec2
   gather_facts: no
   tasks:  
   - name: Running K8s was_slave Role
