@@ -2,6 +2,11 @@
 ################  private ec2(web) ansible ###########################
 #########################################################################
 
+- name: Create a directory "service"
+  ansible.builtin.file:
+    path: /home/ec2-user/service/blind_web
+    state: directory
+    mode: '0755'
 
 ############ copy blind_web files  ###########
 - name: Copy a "blind_web" file into place for ansible

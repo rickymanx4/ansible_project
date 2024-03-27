@@ -3,6 +3,12 @@
 #########################################################################      
 
 
+- name: Create a directory "service"
+  ansible.builtin.file:
+    path: /home/ec2-user/service/blind_was
+    state: directory
+    mode: '0755'
+
  ############ copy blind_was files  ###########
 - name: Copy a "blind_was" file into place for ansible
   ansible.builtin.copy:
