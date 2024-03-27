@@ -10,8 +10,8 @@ cache: false
 filters:
   instance-state-name: running
   tag:name:
-    - web_node
-    - was_node
+    - project-slave-was-ec2
+    - project-slave-web-ec2
     - project-master-ec2
 
 
