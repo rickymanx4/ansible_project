@@ -26,11 +26,7 @@
         - "{{ subnet_web1_result.subnet.id }}"
         - "{{ subnet_web2_result.subnet.id }}"
         - "{{ subnet_was1_result.subnet.id }}"
-        - "{{ subnet_was2_result.subnet.id }}"
-        - "{{ subnet_db1_result.subnet.id }}"
-        - "{{ subnet_db2_result.subnet.id }}"                
-      security_groups:
-        - "{{ security_group_bastion_result.group_id }}"        
+        - "{{ subnet_was2_result.subnet.id }}"                   
     register: eks_cluster_result
 
 
@@ -47,20 +43,18 @@
         min_size: 1
         max_size: 3
         desired_size: 2
-      disk_size: 20
-      instance_types: '{{ instancesize_bastion }}'
-      ami_type: 'AL2023_x86_64'
-      remote_access:
-        ec2_ssh_key: ec2-key
+      launch_template:
+        id: "{{ eks_web_template }}"
+        version: 1
       labels:
-        'name': 'web nodes'
+        name: 'web nodes'
       taints:
         - key: 'test'
           value: 'test'
           effect: 'NO_SCHEDULE'
       capacity_type: 'ON_DEMAND'    
 
-  - name: create nodegroup for was
+  - name: create nodegroup for web
     community.aws.eks_nodegroup:
       name: "{{ eks_nodegroup_name_was }}"
       state: "{{ state }}"
@@ -73,49 +67,14 @@
         min_size: 1
         max_size: 3
         desired_size: 2
-      disk_size: 20
-      remote_access:
-        ec2_ssh_key: ec2-key      
-#      launch_template:
-#        - id : 
-#          name: 
-#          version :
-      instance_types: '{{ instancesize_bastion }}'
-      ami_type: 'AL2023_x86_64'
+      launch_template:
+        id: "{{ eks_was_template }}"
+        version: 1
       labels:
-        'name': 'web nodes'
+        name: 'was nodes'
       taints:
         - key: 'test'
           value: 'test'
           effect: 'NO_SCHEDULE'
-      capacity_type: 'ON_DEMAND'    
-
-  - name: create nodegroup for db
-    community.aws.eks_nodegroup:
-      name: "{{ eks_nodegroup_name_was }}"
-      state: "{{ state }}"
-      cluster_name:  "{{ eks_cluster_name }}"
-      node_role: "{{ eks_nodegroup_role }}"
-      subnets:
-        - "{{ subnet_db1_result.subnet.id }}"
-        - "{{ subnet_db2_result.subnet.id }}"
-      scaling_config:
-        min_size: 1
-        max_size: 3
-        desired_size: 2
-      disk_size: 20
-      remote_access:
-        ec2_ssh_key: ec2-key      
-#      launch_template:
-#        - id : 
-#          name: 
-#          version :
-      instance_types: '{{ instancesize_bastion }}'
-      ami_type: 'AL2023_x86_64'
-      labels:
-        'name': 'web nodes'
-      taints:
-        - key: 'test'
-          value: 'test'
-          effect: 'NO_SCHEDULE'
-      capacity_type: 'ON_DEMAND'        
+      capacity_type: 'ON_DEMAND'
+ 
