@@ -4,23 +4,23 @@
   connection: localhost
   vars_files:
     - ./vars.yaml  
-   
   tasks:
-  - name: Include task list in play vpc
-    ansible.builtin.import_tasks:
-      file: "./tasks/1_vpc.yaml"
-    
-  - name: Include task list in play subnet
-    ansible.builtin.import_tasks:
-      file: "./tasks/2_subnet.yaml"    
 
-  - name: Include task list in play security_group
-    ansible.builtin.import_tasks:
-      file: "./tasks/3_security_group.yaml" 
-
-  - name: Include task list in play efs
-    ansible.builtin.import_tasks:
-      file: "./tasks/9_efs.yaml"
+  - name: Configure internal Elastic Load Balancers
+    amazon.aws.elb_application_lb:
+      region: "{{ region }}"
+      name: "{{ lb_name_internal }}"
+      state: "{{ state }}"
+      subnets: [ subnet-0d93739b4da99a8d5, subnet-02be0fb335a7482fb ]
+      security_groups: [ sg-08d00ae84b9e3fd86 ]
+      scheme: "internal"
+      listeners:
+        - Protocol: HTTP
+          Port: 5000
+          DefaultActions: 
+            - Type: "forward"
+              TargetGroupName: "project-tg-was"   
+    register: inlb_result 
 
 - hosts: was_asg   
   vars: 
@@ -31,12 +31,22 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
   tasks:    
-  - name: Mount up device was efs
-    mount:
-      path: /home/ec2-user/efs
-      src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
-      fstype: nfs4
-      state: mounted  
+  - name: Replace a webservice in loadbalancer
+    ansible.builtin.lineinfile:
+      path: /home/ec2-user/service/board.py
+      regexp: '{{ inlb_result.dns_name }}:5000'
+      line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
+
+  # - name: Replace a webservice service in rds mount point
+  #   ansible.builtin.lineinfile:
+  #     path: /home/ec2-user/service/{{ item }}
+  #     regexp: '{{ rds_result.endpoint.address }}'
+  #     line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
+  #   loop:
+  #     - blind_board_DAO.py  
+  #     - blind_member_DAO.py
+  #     - blind_reply_DAO.py
+
 
 - hosts: web_asg   
   vars: 
@@ -47,14 +57,20 @@
       -i ~/.ssh/ec2-key.pem
       -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
   tasks:    
-  - name: Mount up device web efs 
-    mount:
-      path: /home/ec2-user/efs
-      src: "{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_web }}') }}"
-      fstype: nfs4
-      state: mounted
-    
-# ############ mount efs file system in was ec2 ###########                  
+    - name: Replace a webservice in loadbalancer
+      ansible.builtin.lineinfile:
+        path: /home/ec2-user/service/board.py
+        regexp: '{{ inlb_result.dns_name }}:5000'
+        line: 'http://internal-internalELB-newnew-943065277.ap-northeast-1.elb.amazonaws.com:5000'
 
-#"{{ lookup('aws_efs', 'mount_target_id', region='{{ region }}', file_system_name='{{ efs_name_was }}') }}"
+    # - name: Replace a webservice service in rds mount point
+    #   ansible.builtin.lineinfile:
+    #     path: /home/ec2-user/service/{{ item }}
+    #     regexp: '{{ rds_result.endpoint.address }}'
+    #     line: 'blind.cq83gr1p9r0f.ap-northeast-1.rds.amazonaws.com'
+    #   loop:
+    #     - blind_board_DAO.py  
+    #     - blind_member_DAO.py
+    #     - blind_reply_DAO.py
+
 
