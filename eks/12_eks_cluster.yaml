@@ -22,6 +22,7 @@
       name: "{{ eks_cluster_name }}"
       version: 1.29
       role_arn: "{{ eks_cluster_role }}"
+      security_groups: "{{ eks_default_sg }}"
       subnets:
         - "{{ subnet_web1_result.subnet.id }}"
         - "{{ subnet_web2_result.subnet.id }}"
