@@ -1,7 +1,7 @@
 ---
 - name: Launching master EC2 instances on AWS
   amazon.aws.ec2_instance:
-    name: " k8s ec2 for ansible "
+    name: " k8s ec2 master for ansible "
     key_name: "{{ keys }}"
     instance_type: "{{ instancesize_bastion }}"
     security_group: "{{ security_group_bastion_result.group_id }}"    
@@ -10,13 +10,39 @@
     network:
       assign_public_ip: true    
     image_id: "{{ images }}"
-    count: 3 
     tags: 
       - name: "{{ master_ec2_name }}"
-      - name: "{{ slave_web_ec2_name }}"
-      - name: "{{ slave_was_ec2_name }}" 
-  register: ec2 
+  register: ec2_master
 
+- name: Launching master EC2 instances on AWS
+  amazon.aws.ec2_instance:
+    name: "{{ slave_web_ec2_name }}"
+    key_name: "{{ keys }}"
+    instance_type: "{{ instancesize_bastion }}"
+    security_group: "{{ security_group_bastion_result.group_id }}"    
+    vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+    instance_role: "{{ instance_role }}"
+    network:
+      assign_public_ip: true    
+    image_id: "{{ images }}"
+    tags: 
+      - name: "{{ slave_web_ec2_name }}"
+  register: ec2_web_slave 
+
+- name: Launching master EC2 instances on AWS
+  amazon.aws.ec2_instance:
+    name: "{{ slave_was_ec2_name }}" 
+    key_name: "{{ keys }}"
+    instance_type: "{{ instancesize_bastion }}"
+    security_group: "{{ security_group_bastion_result.group_id }}"    
+    vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+    instance_role: "{{ instance_role }}"
+    network:
+      assign_public_ip: true    
+    image_id: "{{ images }}"
+    tags: 
+      - name: "{{ slave_was_ec2_name }}" 
+  register: ec2_was_slave   
 
 - name: Add master instance to host group ec2_master
   ansible.builtin.add_host:
