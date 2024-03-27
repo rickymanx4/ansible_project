@@ -11,7 +11,7 @@
       assign_public_ip: true    
     image_id: "{{ images }}"
     tags: 
-      - name: "{{ master_ec2_name }}"
+      name: "{{ master_ec2_name }}"
   register: ec2_master
 
 - name: Launching master EC2 instances on AWS
@@ -26,7 +26,7 @@
       assign_public_ip: true    
     image_id: "{{ images }}"
     tags: 
-      - name: "{{ slave_web_ec2_name }}"
+      name: "{{ slave_web_ec2_name }}"
   register: ec2_web_slave 
 
 - name: Launching master EC2 instances on AWS
@@ -41,7 +41,7 @@
       assign_public_ip: true    
     image_id: "{{ images }}"
     tags: 
-      - name: "{{ slave_was_ec2_name }}" 
+      name: "{{ slave_was_ec2_name }}" 
   register: ec2_was_slave   
 
 - name: Add master instance to host group ec2_master
