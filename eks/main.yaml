@@ -25,21 +25,21 @@
   #   ansible.builtin.import_tasks:
   #     file: ./ec2_control.yaml 
 
-- hosts: project-master-ec2
+- hosts: project_master_ec2
   gather_facts: no
   tasks:
   - name: Running K8s Master task
     ansible.builtin.import_tasks:
       file: ./master.yaml
 
-- hosts: project-slave-web-ec2
+- hosts: project_slave_web_ec2
   gather_facts: no
   tasks:  
   - name: Running K8s web_slave Role
     ansible.builtin.import_tasks:
       file: ./slave.yaml
 
-- hosts: project-slave-was-ec2
+- hosts: project_slave_was_ec2
   gather_facts: no
   tasks:  
   - name: Running K8s was_slave Role
