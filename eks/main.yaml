@@ -21,10 +21,9 @@
     ansible.builtin.import_tasks:
       file: ./eks_cluster.yaml 
 
-  - name: 5. creat eks node grouping
-    ansible.builtin.import_tasks:
-      file: ./ec2_control.yaml 
-
+  # - name: 5. creat eks node grouping
+  #   ansible.builtin.import_tasks:
+  #     file: ./ec2_control.yaml 
 
 - hosts: ec2_master
   gather_facts: no
