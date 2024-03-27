@@ -10,7 +10,7 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 - name: Installing Docker & kubeadm on Master Node
-  ansible.builtin.package:
+  ansible.builtin.dnf:
     name:
       - docker
       - kubeadm
