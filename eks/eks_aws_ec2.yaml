@@ -9,9 +9,10 @@ cache: false
 
 filters:
   instance-state-name: running
-  tag:eks:nodegroup-name:
-    - project-nodegroup-web
-    - project-nodegroup-was
+  tags:
+    eks:nodegroup-name:
+      - project-nodegroup-web
+      - project-nodegroup-was
 
 
 

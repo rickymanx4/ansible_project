@@ -34,7 +34,6 @@
     node_role: "{{ eks_nodegroup_role }}"
     subnets:
       - "{{ subnet_pub1_result.subnet.id }}"
-      - "{{ subnet_pub2_result.subnet.id }}"
     scaling_config:
       min_size: 1
       max_size: 3
@@ -58,7 +57,6 @@
     cluster_name:  "{{ eks_cluster_result.name }}"
     node_role: "{{ eks_nodegroup_role }}"
     subnets:
-      - "{{ subnet_pub1_result.subnet.id }}"
       - "{{ subnet_pub2_result.subnet.id }}"
     scaling_config:
       min_size: 1
