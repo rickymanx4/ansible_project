@@ -3,7 +3,7 @@
   amazon.aws.ec2_instance:
     key_name: "{{ keys }}"
     instance_type: "{{ instancesize_bastion }}"
-    image: "{{ images }}"
+    image_id: "{{ images }}"
     wait: true
     group: "{{ security_group_name_bastion }}"
     count: 1
