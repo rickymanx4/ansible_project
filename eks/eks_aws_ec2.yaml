@@ -9,15 +9,16 @@ cache: false
 
 filters:
   instance-state-name: running
-  tag:nodegroup-name:
+  tag:eks:nodegroup-name:
     - project-nodegroup-web
     - project-nodegroup-was
+
 
 
 keyed_groups:
   #  - prefix: tags
   #    key: tags
-  - key: tags.nodegroup-name
+  - key: tags.eks:nodegroup-name
     separator: ''
 hostnames:
   - network-interface.association.public-ip
