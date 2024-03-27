@@ -1,0 +1,35 @@
+---
+- name: Launching master EC2 instances on AWS
+  amazon.aws.ec2_instance:
+    name: " k8s ec2 for ansible "
+    key_name: "{{ keys }}"
+    instance_type: "{{ instancesize_bastion }}"
+    security_group: "{{ security_group_bastion_result.group_id }}"    
+    vpc_subnet_id: "{{ subnet_pub1_result.subnet.id }}"
+    instance_role: "{{ instance_role }}"
+    network:
+      assign_public_ip: true    
+    image_id: "{{ images }}"
+    count: 3 
+    tags:
+      - name: "{{ master_ec2_name }}"
+      - name: "{{ slave_web_ec2_name }}"
+      - name: "{{ slave_was_ec2_name }}"
+  register: ec2 
+
+
+- name: Add master instance to host group ec2_master
+  ansible.builtin.add_host:
+    name: "{{ ec2.results[0].instances[0].public_ip }}"
+    groups: [ ec2_master ]
+
+- name: Add web_1 instance to host group ec2_web_slave
+  ansible.builtin.add_host:
+    name: "{{ ec2.results[1].instances[0].public_ip }}"
+    groups: [ ec2_web_slave ]
+
+- name: Add web_2 instance to host group ec2_web_slave
+  ansible.builtin.add_host:
+    name: "{{ ec2.results[2].instances[0].public_ip }}"
+    groups: [ ec2_web_slave ]
+

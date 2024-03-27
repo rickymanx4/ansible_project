@@ -19,7 +19,7 @@
 
   - name: 4. creat eks cluster, nodegroup, master ec2
     ansible.builtin.import_tasks:
-      file: ./eks_cluster.yaml 
+      file: ./eks_ec2.yaml 
 
   # - name: 5. creat eks node grouping
   #   ansible.builtin.import_tasks:
