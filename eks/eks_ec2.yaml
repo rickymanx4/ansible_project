@@ -12,11 +12,9 @@
     image_id: "{{ images }}"
     count: 3 
     tags: 
-      - name: "{{ item }}"
-  loop:  
-    - "{{ master_ec2_name }}"
-    - "{{ slave_web_ec2_name }}"
-    - "{{ slave_was_ec2_name }}"
+      - name: "{{ master_ec2_name }}"
+      - name: "{{ slave_web_ec2_name }}"
+      - name: "{{ slave_was_ec2_name }}" 
   register: ec2 
 
 
