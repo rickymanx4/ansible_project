@@ -2,6 +2,7 @@
 ################  private ec2(web) ansible ###########################
 #########################################################################
 
+############ create blind_web directory   ###########
 - name: Create a directory "blind_web"
   ansible.builtin.file:
     path: /home/ec2-user/service/blind_web
@@ -41,6 +42,7 @@
     state: mounted
 # src 부분에서 efs 생성의 return값을 반환하지 못하여 efs의 dns를 직접 입력
 
+############# replace internal load balancer in board.py ###############  
 - name: Replace a webservice in loadbalancer
   ansible.builtin.replace:
     path: /home/ec2-user/service/blind_web/board.py
@@ -48,6 +50,7 @@
     replace: 'http://internal-project-lb-internal-1432703978.ap-northeast-1.elb.amazonaws.com'
 # 변수 적용이 안되서 in lb의 dns주소를 직접 입력
 
+############# replace rds end point in service .py file ###############  
 - name: Replace a webservice service in rds mount point
   ansible.builtin.replace:
     path: /home/ec2-user/service/blind_web/{{ item }}    

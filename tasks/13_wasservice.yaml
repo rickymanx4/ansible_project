@@ -2,7 +2,7 @@
 ################  private ec2(was) ansible ###########################
 #########################################################################      
 
-
+############ create blind_was directory   ###########
 - name: Create a directory "blind_was"
   ansible.builtin.file:
     path: /home/ec2-user/service/blind_was
@@ -43,6 +43,7 @@
 
 # src 부분에서 efs 생성의 return값을 반환하지 못하여 직접 입력      
 
+############# replace rds end point in service .py file ############### 
 - name: Replace a wasservice service in rds mount point
   ansible.builtin.replace:
     path: /home/ec2-user/service/blind_was/{{ item }}    

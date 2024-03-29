@@ -42,56 +42,9 @@
     ansible.builtin.import_tasks:
       file: "./tasks/9_efs.yaml"       
 
-  - name: Include task list in play efs
+  - name: Include task list in play rds
     ansible.builtin.import_tasks:
       file: "./tasks/10_rds.yaml"                     
 
-- hosts: project_ec2_bastion
-  tasks:
-  - name: Include task list in play bastion for ansible
-    ansible.builtin.import_tasks:
-      file: ./tasks/11_bastion.yaml 
 
-- hosts: 
-  - web_asg
-  - was_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"
-  tasks:
-  - name: Include task list in play private ec2 default setting
-    ansible.builtin.import_tasks:
-      file: ./tasks/12_private.yaml       
 
-- hosts: web_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
-  tasks:
-  - name: Include task list in play webserver service
-    ansible.builtin.import_tasks:
-      file: ./tasks/13_webservice.yaml     
-
-- hosts: was_asg
-  gather_facts: no
-  vars: 
-    ansible_ssh_common_args:
-      -o ProxyCommand="ssh
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i ~/.ssh/ec2-key.pem
-      -W %h:%p ec2-user@{{ hostvars[groups['project_ec2_bastion'][0]]["public_ip_address"] }}"  
-  tasks:
-  - name: Include task list in play wasserver service
-    ansible.builtin.import_tasks:
-      file: ./tasks/14_wasservice.yaml

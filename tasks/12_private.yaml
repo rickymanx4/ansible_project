@@ -2,7 +2,7 @@
 ################  private ec2(web, was) ansible ###########################
 #########################################################################
 
-############ ec2-user join group whell ###########
+############ ec2-user join group wheel ###########
 - name: Add the user 'ec2-user' with a bash shell, appending the group 'wheel' 
   ansible.builtin.user:
     name: ec2-user
