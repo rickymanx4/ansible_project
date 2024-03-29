@@ -22,20 +22,20 @@
   register: igw_result
   
 ########### create a elastic IP for nat gateway ###########
-# - name: allocate a new elastic IP 
-#   amazon.aws.ec2_eip:
-#     state: "{{ state }}"
-#     tags:
-#       name:  "{{ eip_name }}"
-#   register: eip_result
+- name: allocate a new elastic IP 
+  amazon.aws.ec2_eip:
+    state: "{{ state }}"
+    tags:
+      name:  "{{ eip_name }}"
+  register: eip_result
 
-# ########### create a nat gateway for private routing table ###########
-# - name: Create new nat gateway 
-#   amazon.aws.ec2_vpc_nat_gateway:
-#     state: "{{ state }}"
-#     subnet_id: "{{ subnet_pub2_result.subnet.id }}"
-#     eip_address: "{{ eip_result.public_ip }}"
-#     region: "{{ region }}"
-#     tags:
-#       name:  "{{ nat_gateway_name }}"      
-#   register: nat_gateway_result
+########### create a nat gateway for private routing table ###########
+- name: Create new nat gateway 
+  amazon.aws.ec2_vpc_nat_gateway:
+    state: "{{ state }}"
+    subnet_id: "{{ subnet_pub2_result.subnet.id }}"
+    eip_address: "{{ eip_result.public_ip }}"
+    region: "{{ region }}"
+    tags:
+      name:  "{{ nat_gateway_name }}"      
+  register: nat_gateway_result

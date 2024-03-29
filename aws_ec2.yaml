@@ -13,8 +13,7 @@ filters:
     - was_asg
     - web_asg
     - project_ec2_bastion
-    - node2
-    - test_nodegroup
+
 
 keyed_groups:
   #  - prefix: tags

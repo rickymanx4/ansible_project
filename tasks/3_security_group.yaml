@@ -128,11 +128,7 @@
     - proto: tcp
       ports:
       - 3306
-      group_name: "{{ security_group_name_web }}"      
-    - proto: tcp
-      ports:
-      - 3306
-      group_name: "{{ security_group_name_bastion }}"      
+      group_name: "{{ security_group_name_web }}"           
       rule_desc: allow all on port 3306      
   register: security_group_db_result
 
