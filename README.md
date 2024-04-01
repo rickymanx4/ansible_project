@@ -1,13 +1,13 @@
 # ansible_project
 # 3-tier archiecture ansible_project
 
-#1. create infra
+# 1. create infra
 # ansible-playbook main_infra.yaml
 
-#2. excute service
+# 2. excute service
 # ansible-playbook sub_ec2.yaml
 
-#3. excute monitoring
+# 3. excute monitoring
 # ansible-playbook mointoring/playbook.yaml
 
 
