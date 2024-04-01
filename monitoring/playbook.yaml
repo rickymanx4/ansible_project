@@ -23,3 +23,6 @@
     - role/prometheus
     - role/grafana
  
+# ansible-galaxy role init node_exporter
+# ansible-galaxy role init prometheus
+# ansible-galaxy role init grafana
